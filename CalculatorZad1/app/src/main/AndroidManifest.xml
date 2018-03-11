@@ -37,6 +37,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.anwyr1.calculatorzad1.Main2Activity" />
         </activity>
+        <activity android:name=".AdvancedCalculatorActivity"></activity>
     </application>
+
 
 </manifest>
