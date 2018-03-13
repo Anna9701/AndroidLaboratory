@@ -1,21 +1,21 @@
-package com.example.anwyr1.calculatorzad1;
+package com.example.anwyr1.calculatorzad1.Activities;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
-import java.util.UnknownFormatConversionException;
+import com.example.anwyr1.calculatorzad1.Services.AdvancedCalculator;
+import com.example.anwyr1.calculatorzad1.R;
 
 public class AdvancedCalculatorActivity extends AppCompatActivity {
-    private BasicCalculator calculator;
+    private AdvancedCalculator calculator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_advanced_calculator);
-        calculator = new BasicCalculator(findViewById(R.id.textView2));
+        calculator = new AdvancedCalculator(findViewById(R.id.textView2));
     }
 
     public void onClickNumber(View v) {

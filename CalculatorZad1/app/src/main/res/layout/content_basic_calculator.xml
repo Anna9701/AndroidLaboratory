@@ -16,17 +16,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appbar"
-        tools:context="com.example.anwyr1.calculatorzad1.AdvancedCalculatorActivity">
+        tools:context="com.example.anwyr1.calculatorzad1.Activities.AdvancedCalculatorActivity">
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/tableRow4"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/tableRow6"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="75dp">
+            app:layout_constraintTop_toBottomOf="@+id/tableRow2">
 
             <Button
                 android:id="@+id/button5"
@@ -70,6 +74,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginEnd="8dp"
+                android:onClick="onClickOperator"
                 android:text="%"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -82,14 +87,17 @@
             android:id="@+id/tableRow8"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="40dp">
+            app:layout_constraintTop_toBottomOf="@+id/tableRow7">
 
             <Button
                 android:id="@+id/button6"
@@ -146,15 +154,18 @@
         <android.support.constraint.ConstraintLayout
             android:id="@+id/tableRow7"
             android:layout_width="0dp"
-            android:layout_height="40"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/tableRow8"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="677dp">
+            app:layout_constraintTop_toBottomOf="@+id/tableRow">
 
             <Button
                 android:id="@+id/button30"
@@ -210,12 +221,16 @@
         <android.support.constraint.ConstraintLayout
             android:id="@+id/tableRow"
             android:layout_width="0dp"
-            android:layout_height="40"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/tableRow7"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="319dp">
+            app:layout_constraintTop_toBottomOf="@+id/tableRow6">
 
             <Button
                 android:id="@+id/button34"
@@ -273,10 +288,15 @@
             android:id="@+id/tableRow6"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/tableRow"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tableRow4">
 
             <Button
                 android:id="@+id/button38"
@@ -332,15 +352,18 @@
         <android.support.constraint.ConstraintLayout
             android:id="@+id/tableRow2"
             android:layout_width="0dp"
-            android:layout_height="59dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/tableRow4"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="373dp">
+            app:layout_constraintTop_toBottomOf="@+id/guideline">
 
             <TextView
                 android:id="@+id/textView2"

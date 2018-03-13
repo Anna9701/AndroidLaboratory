@@ -1,9 +1,13 @@
-package com.example.anwyr1.calculatorzad1;
+package com.example.anwyr1.calculatorzad1.Services;
 
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
 
-import java.util.UnknownFormatConversionException;
+import com.example.anwyr1.calculatorzad1.Interfaces.ICNumber;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by anwyr1 on 10/03/2018.
@@ -18,17 +22,12 @@ public class BasicCalculator {
         resultPrinted = false;
     }
 
-    void handleNumber(String inputted) {
+    public void handleNumber(String inputted) {
         if (resultPrinted) {
             clearInput();
             resultPrinted = false;
         }
-        try {
-            int number = Integer.parseInt(inputted);
-            textView.append(String.valueOf(number));
-        } catch (NumberFormatException ex) {
-            System.err.println(ex.getMessage());
-        }
+        textView.append(inputted);
     }
 
     private void clearInput() {
@@ -55,59 +54,62 @@ public class BasicCalculator {
         return null;
     }
 
-    private double getResult(double number, double secondNumber, char action) {
-        switch (action) {
-            case '+':
-                return number + secondNumber;
-            case '-':
-                return number - secondNumber;
-            case '*':
-                return number * secondNumber;
-            case '/':
-                return number / secondNumber;
+    private ArrayList<ICNumber> getInputNumbersSplitted() {
+        String inputted = textView.getText().toString();
+        String splitted[] = {""};
+        ArrayList<ICNumber> numbers = new ArrayList<>();
+        if(inputted.length() > 0) {
+            splitted = inputted.split("[^0-9.%]");
         }
-
-        throw new UnknownFormatConversionException("Wrong operator " + action);
+        for (String s : splitted) {
+            numbers.add(new InputtedNumber(s));
+        }
+        return numbers;
     }
 
     public void summarize() {
-        String inputs[] = getInputTextSplitted();
+        final double PERCENT_VALUE = 0.1;
+        List<ICNumber> numbers = getInputNumbersSplitted();
         String operators = getInputOperators();
-        if (inputs == null || inputs.length < 2 || operators.length() == 0) {
+        if (numbers.size() == 0 || operators.length() == 0 && !numbers.get(0).isPercent()) {
             return;
+        } else if (operators.length() == 0 && numbers.get(0).isPercent()) {
+            textView.setText(String.valueOf(numbers.get(0).getValue() * PERCENT_VALUE));
+            resultPrinted = true;
+            return;
+
         }
         double result = 0;
         for (int i = 0, j = 0; j < operators.length(); i += 2, ++j) {
-            double number = Double.parseDouble(inputs[i]);
-            double secondNumber = Double.parseDouble(inputs[i + 1]);
             char action = operators.charAt(j);
-            result += getResult(number, secondNumber, action);
+            result += InputtedNumber.countResult(numbers.get(i), numbers.get(i + 1), action);
         }
         textView.setText(String.valueOf(result));
         resultPrinted = true;
     }
 
+    @NonNull
     private String getInputOperators() {
         CharSequence inputted = textView.getText();
-        String operators = "";
+        StringBuilder operators = new StringBuilder();
         for (int i = 0; i < inputted.length(); ++i) {
             switch (inputted.charAt(i)) {
                 case '-':
                 case '+':
                 case '*':
                 case '/':
-                    operators += inputted.charAt(i);
+                    operators.append(inputted.charAt(i));
                     break;
             }
         }
-        return operators;
+        return operators.toString();
     }
 
     public void handleOperator(String operator) {
         if (resultPrinted)
             resultPrinted = false;
         String input = textView.getText().toString();
-        if (Character.isDigit(input.charAt(input.length() - 1)))
+        if (Character.isDigit(input.charAt(input.length() - 1)) || input.charAt(input.length() - 1) == '%')
             textView.append(operator);
     }
 }

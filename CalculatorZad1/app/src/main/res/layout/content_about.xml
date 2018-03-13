@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.anwyr1.calculatorzad1.AboutActivity"
+    tools:context="com.example.anwyr1.calculatorzad1.Activities.AboutActivity"
     tools:showIn="@layout/activity_about">
 
     <LinearLayout

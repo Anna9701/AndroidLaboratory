@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.anwyr1.calculatorzad1.AdvancedCalculatorActivity">
+    tools:context="com.example.anwyr1.calculatorzad1.Activities.AdvancedCalculatorActivity">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="0dp"
@@ -16,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:context="com.example.anwyr1.calculatorzad1.AdvancedCalculatorActivity">
+        tools:context="com.example.anwyr1.calculatorzad1.Activities.AdvancedCalculatorActivity">
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/tableRow4"
@@ -73,6 +73,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginEnd="8dp"
+                android:onClick="onClickOperator"
                 android:text="%"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

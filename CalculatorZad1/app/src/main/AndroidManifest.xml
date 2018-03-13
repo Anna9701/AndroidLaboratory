@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".Main2Activity"
+            android:name=".Activities.Main2Activity"
             android:label="@string/title_activity_main2"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -20,24 +20,24 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AboutActivity"
+            android:name=".Activities.AboutActivity"
             android:label="@string/title_activity_about"
-            android:parentActivityName=".Main2Activity"
+            android:parentActivityName=".Activities.Main2Activity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.anwyr1.calculatorzad1.Main2Activity" />
+                android:value="com.example.anwyr1.calculatorzad1.Activities.Main2Activity" />
         </activity>
         <activity
-            android:name=".BasicCalculatorActivity"
+            android:name=".Activities.BasicCalculatorActivity"
             android:label="@string/title_activity_basic_calculator"
-            android:parentActivityName=".Main2Activity"
+            android:parentActivityName=".Activities.Main2Activity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.anwyr1.calculatorzad1.Main2Activity" />
+                android:value="com.example.anwyr1.calculatorzad1.Activities.Main2Activity" />
         </activity>
-        <activity android:name=".AdvancedCalculatorActivity"></activity>
+        <activity android:name=".Activities.AdvancedCalculatorActivity"></activity>
     </application>
 
 
