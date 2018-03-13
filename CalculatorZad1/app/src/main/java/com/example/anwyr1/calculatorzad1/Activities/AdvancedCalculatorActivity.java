@@ -1,16 +1,10 @@
 package com.example.anwyr1.calculatorzad1.Activities;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-
 import com.example.anwyr1.calculatorzad1.Services.AdvancedCalculator;
 import com.example.anwyr1.calculatorzad1.R;
 
-public class AdvancedCalculatorActivity extends AppCompatActivity {
-    private AdvancedCalculator calculator;
-
+public class AdvancedCalculatorActivity extends BasicCalculatorActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -18,23 +12,4 @@ public class AdvancedCalculatorActivity extends AppCompatActivity {
         calculator = new AdvancedCalculator(findViewById(R.id.textView2));
     }
 
-    public void onClickNumber(View v) {
-        Button b = (Button) v;
-        String number = b.getText().toString();
-        calculator.handleNumber(number);
-    }
-
-    public void onClickDot(View v) {
-        calculator.handleDotInput();
-    }
-
-    public void onClickOperator(View v) {
-        Button b = (Button) v;
-        String operator = b.getText().toString();
-        calculator.handleOperator(operator);
-    }
-
-    public void onSummarizeClick(View v) {
-        calculator.summarize();
-    }
 }

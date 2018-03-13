@@ -27,7 +27,14 @@ public class InputtedNumber implements ICNumber {
     public double getValue() {
         return value;
     }
+/*TODO
+    in case of  changing sign of number please implement some characters pattern (e.g. rounds brackets),
+    change them (if there are pattern exist (e.g. negation of negated value), remove pattern.
+    Process that pattern in getter and setter of that class?
+    Maybe static method returning valid pattern due to current state (check it in some method?)
 
+
+*/
     @Override
     public boolean isMinus() {
         return isMinus;
@@ -52,8 +59,20 @@ public class InputtedNumber implements ICNumber {
         if (second.isPercent()) {
             secondValue = firstValue * secondValue / PERCENT_DIVIDER;
         }
+        if (first.isMinus())
+            firstValue = -(firstValue);
+        if (second.isMinus())
+            secondValue = -(secondValue);
         return count(firstValue, secondValue, action);
     }
+
+    /*
+    TODO
+    please consider input like: 6 / 3 + 2
+    It is necessary to count first numbers first and then make addition of third value
+    Consider also the order of mathematics operations
+     */
+
 
     static private double count(final double first, final double second, final char action) {
         switch (action) {
