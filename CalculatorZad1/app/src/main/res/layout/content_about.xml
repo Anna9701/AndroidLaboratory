@@ -22,20 +22,16 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/textViewName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/Author"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-            tools:text="@string/Author" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/textViewUniversity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/TUL"
-            android:textAppearance="@style/TextAppearance.AppCompat.Light.SearchResult.Subtitle"
-            tools:text="@string/TUL" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Light.SearchResult.Subtitle" />
 
         <TextView
             android:id="@+id/textView9"
@@ -45,12 +41,9 @@
             app:layout_constraintLeft_toLeftOf="parent" />
 
         <TextView
-            android:id="@+id/textView4"
+            android:id="@+id/textViewAbout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/about"
-            android:textAppearance="@android:style/TextAppearance"
-            tools:text="@string/about" />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

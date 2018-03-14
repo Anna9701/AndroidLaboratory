@@ -42,5 +42,11 @@ public class BasicCalculatorActivity extends AppCompatActivity {
         calculator.summarize();
     }
 
+    public void onBackspaceClick(View v) {
+        calculator.handleBackspace;
+    }
 
+    public void onClearClick(View v) {
+        calculator.clearInput();
+    }
 }

@@ -30,7 +30,7 @@ public class BasicCalculator {
         textView.append(inputted);
     }
 
-    private void clearInput() {
+    public void clearInput() {
         textView.setText("");
     }
 
@@ -49,7 +49,7 @@ public class BasicCalculator {
     private String[] getInputTextSplitted() {
         String inputted = textView.getText().toString();
         if(inputted.length() > 0) {
-            return inputted.split("[^0-9.]");
+            return inputted.split("[^0-9.%]"); //TODO check if works
         }
         return null;
     }
@@ -67,6 +67,7 @@ public class BasicCalculator {
         return numbers;
     }
 
+    //TODO check if works
     public void summarize() {
         final double PERCENT_VALUE = 0.1;
         List<ICNumber> numbers = getInputNumbersSplitted();
@@ -79,11 +80,14 @@ public class BasicCalculator {
             return;
 
         }
+
         double result = 0;
-        for (int i = 0, j = 0; j < operators.length(); i += 2, ++j) {
+        for (int i = 0, j = 0; j < operators.length(); ++i, ++j) {
             char action = operators.charAt(j);
-            result += InputtedNumber.countResult(numbers.get(i), numbers.get(i + 1), action);
+            numbers.get(i).setValue(InputtedNumber.countResult(numbers.get(i), numbers.get(i + 1), action));
+            result += numbers.get(i).getValue();
         }
+
         textView.setText(String.valueOf(result));
         resultPrinted = true;
     }

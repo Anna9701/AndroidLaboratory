@@ -24,6 +24,11 @@ public class InputtedNumber implements ICNumber {
     }
 
     @Override
+    public void setValue(double value) {
+        this.value = value;
+    }
+
+    @Override
     public double getValue() {
         return value;
     }

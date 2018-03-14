@@ -12,4 +12,6 @@ public interface ICNumber {
     void setMinus(boolean minus);
 
     boolean isPercent();
+
+    void setValue(double value);
 }

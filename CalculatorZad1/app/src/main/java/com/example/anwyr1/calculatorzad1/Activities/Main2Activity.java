@@ -15,13 +15,13 @@ public class Main2Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Button exitButton = (Button) findViewById(R.id.button4);
-        Button aboutButton = (Button) findViewById(R.id.button3);
-        Button advancedButton = (Button) findViewById(R.id.button2);
-        Button simpleButton = (Button) findViewById(R.id.button);
+        Button exitButton = findViewById(R.id.button4);
+        Button aboutButton = findViewById(R.id.button3);
+        Button advancedButton = findViewById(R.id.button2);
+        Button simpleButton = findViewById(R.id.button);
 
         exitButton.setOnClickListener(new View.OnClickListener() {
             @Override
