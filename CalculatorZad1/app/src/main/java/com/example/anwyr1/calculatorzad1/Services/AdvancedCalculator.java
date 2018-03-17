@@ -11,4 +11,10 @@ public class AdvancedCalculator extends BasicCalculator {
     public AdvancedCalculator(View v, Activity activity) {
         super(v, activity);
     }
+
+    public void handleSquarePower() {
+        if (!(textView.getText().length() > 0)) return;
+        handleOperator("^");
+        textView.append("2");
+    }
 }

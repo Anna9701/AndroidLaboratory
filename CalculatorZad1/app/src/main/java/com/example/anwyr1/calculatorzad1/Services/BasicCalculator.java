@@ -21,9 +21,9 @@ import java.util.List;
  */
 
 public class BasicCalculator {
-    private final TextView textView;
-    private boolean resultPrinted;
-    private Activity activity;
+    protected final TextView textView;
+    protected boolean resultPrinted;
+    protected Activity activity;
 
     public BasicCalculator(View v, Activity activity) {
         textView = (TextView) v;
@@ -55,7 +55,7 @@ public class BasicCalculator {
         }
     }
 
-    private String[] getInputTextSplitted() {
+    protected String[] getInputTextSplitted() {
         String inputted = textView.getText().toString();
         if(inputted.length() > 0) {
             return inputted.split("[^0-9.%]");
@@ -63,7 +63,7 @@ public class BasicCalculator {
         return null;
     }
 
-    private ArrayList<ICNumber> getInputNumbersSplitted() {
+    protected ArrayList<ICNumber> getInputNumbersSplitted() {
         String inputted = textView.getText().toString();
         String splitted[] = {""};
         ArrayList<ICNumber> numbers = new ArrayList<>();
@@ -105,7 +105,7 @@ public class BasicCalculator {
     }
 
     @NonNull
-    private String getInputOperators() {
+    protected String getInputOperators() {
         CharSequence inputted = textView.getText();
         StringBuilder operators = new StringBuilder();
         for (int i = 1; i < inputted.length(); ++i) {
@@ -147,13 +147,14 @@ public class BasicCalculator {
 
     }
 
-    private void changeIntoNegative(String input, String splitted) {
+    protected void changeIntoNegative(String input, String splitted) {
         textView.setText(input.subSequence(0, input.length() - splitted.length()));
         splitted = "(-" + splitted + ")";
         textView.append(splitted);
     }
-    
-    private void changeIntoPositive(String input, String splitted) {
+
+    //TODO check commented lines
+    protected void changeIntoPositive(String input, String splitted) {
         if (splitted.contains("(-")) {
             textView.setText(input.subSequence(0, input.length() - splitted.length()));
             splitted = splitted.substring("(-".length(), splitted.length() - ")".length());
@@ -186,7 +187,7 @@ public class BasicCalculator {
             textView.setText(inputtedText.subSequence(0, length - 1));
     }
 
-    private void showAlert(String title, String content) {
+    protected void showAlert(String title, String content) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setMessage(content)
                 .setTitle(title);
