@@ -68,17 +68,20 @@ public class BasicCalculator {
         String splitted[] = {""};
         ArrayList<ICNumber> numbers = new ArrayList<>();
         if(inputted.length() > 0) {
-            inputted = inputted.replace(")-", ") -");
+            inputted = inputted.replace("-", " -");
+            inputted = inputted.replace("( ", "(");
             splitted = inputted.split("[^(\\-0-9.%)]");
         }
         for (String s : splitted) {
-            numbers.add(new InputtedNumber(s));
+            if (s.length() > 0)
+                numbers.add(new InputtedNumber(s));
         }
         return numbers;
     }
 
-    //TODO 5+(-5)-5 -> now result is 0, fix it.
+    //TODO Consider operators order
     public void summarize() {
+        if (textView.getText().length() == 0) return;
         final double PERCENT_BASE = 100;
         List<ICNumber> numbers = getInputNumbersSplitted();
         String operators = getInputOperators();
@@ -106,16 +109,17 @@ public class BasicCalculator {
         CharSequence inputted = textView.getText();
         StringBuilder operators = new StringBuilder();
         for (int i = 1; i < inputted.length(); ++i) {
-            switch (inputted.charAt(i)) {
+            char inputtedChar = inputted.charAt(i);
+            switch (inputtedChar) {
                 case '+':
                 case '*':
                 case '/':
-                    operators.append(inputted.charAt(i));
+                    operators.append(inputtedChar);
                     break;
                 case '-':
-                    if (Character.isDigit(inputted.charAt(i - 1) ))
-                        operators.append(inputted.charAt(i));
-                        break;
+                    if (Character.isDigit(inputted.charAt(i - 1)) || inputted.charAt(i - 1) == ')')
+                        operators.append(inputtedChar);
+                    break;
             }
         }
         return operators.toString();
@@ -123,7 +127,9 @@ public class BasicCalculator {
 
     public void handleChangSignOperator() {
         String input = textView.getText().toString();
-        input = input.replace(")-", ") -");
+        if (input.length() == 0) return;
+        input = input.replace("-", " -");
+        input = input.replace("( ", "(");
         String[] splitted = input.split("[^(\\-0-9.%)]");
         int index = splitted.length;
         if (index-- == 0 || !Character.isDigit(input.charAt(input.length() - 1)) &&
@@ -146,16 +152,18 @@ public class BasicCalculator {
         splitted = "(-" + splitted + ")";
         textView.append(splitted);
     }
-
-    //TODO (-6) 
+    
     private void changeIntoPositive(String input, String splitted) {
         if (splitted.contains("(-")) {
-            textView.setText(input.subSequence(0, input.length() - splitted.length() - 1));
+            textView.setText(input.subSequence(0, input.length() - splitted.length()));
             splitted = splitted.substring("(-".length(), splitted.length() - ")".length());
             textView.append(splitted);
         } else {
             textView.setText(input.subSequence(0, input.length() - splitted.length()));
-            splitted = "+" + splitted.substring(1);
+           // if (textView.getText().length() == 0)
+            //    splitted = splitted.substring(1);
+            //else
+                splitted = "+" + splitted.substring(1);
             textView.append(splitted);
         }
     }

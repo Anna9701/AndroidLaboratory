@@ -23,6 +23,8 @@ public class InputtedNumber implements ICNumber {
             value = Double.parseDouble(input.substring("(-".length(), input.length() - ")".length()));
         } else {
             value = Double.parseDouble(input);
+            if (value < 0)
+                isMinus = true;
         }
     }
 
