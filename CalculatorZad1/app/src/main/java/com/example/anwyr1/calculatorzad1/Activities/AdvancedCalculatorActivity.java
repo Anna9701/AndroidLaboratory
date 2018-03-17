@@ -9,7 +9,7 @@ public class AdvancedCalculatorActivity extends BasicCalculatorActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_advanced_calculator);
-        calculator = new AdvancedCalculator(findViewById(R.id.textView2));
+        calculator = new AdvancedCalculator(findViewById(R.id.textView2), this);
     }
 
 }

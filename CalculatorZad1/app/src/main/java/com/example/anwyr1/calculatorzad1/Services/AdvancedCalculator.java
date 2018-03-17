@@ -1,5 +1,6 @@
 package com.example.anwyr1.calculatorzad1.Services;
 
+import android.app.Activity;
 import android.view.View;
 
 /**
@@ -7,7 +8,7 @@ import android.view.View;
  */
 
 public class AdvancedCalculator extends BasicCalculator {
-    public AdvancedCalculator(View v) {
-        super(v);
+    public AdvancedCalculator(View v, Activity activity) {
+        super(v, activity);
     }
 }

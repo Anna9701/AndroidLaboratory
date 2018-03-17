@@ -19,7 +19,7 @@ public class BasicCalculatorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_basic_calculator);
-        calculator = new BasicCalculator(findViewById(R.id.textView2));
+        calculator = new BasicCalculator(findViewById(R.id.textView2), this);
     }
 
     public void onClickNumber(View v) {
@@ -43,7 +43,11 @@ public class BasicCalculatorActivity extends AppCompatActivity {
     }
 
     public void onBackspaceClick(View v) {
-        calculator.handleBackspace;
+        calculator.handleBackspace();
+    }
+
+    public void onChangeSignClick(View v) {
+        calculator.handleChangSignOperator();
     }
 
     public void onClearClick(View v) {
