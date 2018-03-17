@@ -10,6 +10,7 @@ import com.example.anwyr1.calculatorzad1.R;
 
 public class AdvancedCalculatorActivity extends AppCompatActivity {
     private AdvancedCalculator calculator;
+    private final static char POWER_OPERATOR = '^';
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,5 +54,8 @@ public class AdvancedCalculatorActivity extends AppCompatActivity {
     public void onSquarePowerClick(View v) {
         calculator.handleSquarePower();
     }
-    
+
+    public void onPowerClick(View v) {
+        calculator.handleOperator(String.valueOf(POWER_OPERATOR));
+    }
 }

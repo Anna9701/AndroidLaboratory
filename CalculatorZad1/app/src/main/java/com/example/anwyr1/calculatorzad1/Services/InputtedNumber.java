@@ -69,6 +69,7 @@ public class InputtedNumber implements ICNumber {
         return count(firstValue, secondValue, action);
     }
 
+    //TODO add action for power
     static private double count(final double first, final double second, final char action) {
         switch (action) {
             case '+':
