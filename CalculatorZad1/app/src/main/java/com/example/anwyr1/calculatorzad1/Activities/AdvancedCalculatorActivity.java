@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.anwyr1.calculatorzad1.Services.AdvancedCalculator;
 import com.example.anwyr1.calculatorzad1.R;
@@ -11,12 +12,24 @@ import com.example.anwyr1.calculatorzad1.R;
 public class AdvancedCalculatorActivity extends AppCompatActivity {
     private AdvancedCalculator calculator;
     private final static char POWER_OPERATOR = '^';
+    private final static String InputRestoreKey = "input";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_advanced_calculator);
-        calculator = new AdvancedCalculator(findViewById(R.id.textView2), this);
+        TextView inputView = findViewById(R.id.textView2);
+        calculator = new AdvancedCalculator(inputView, this);
+        if (savedInstanceState != null) {
+            inputView.setText(savedInstanceState.getString(InputRestoreKey));
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle bundle) {
+        super.onSaveInstanceState(bundle);
+        TextView input = findViewById(R.id.textView2);
+        bundle.putString(InputRestoreKey, input.getText().toString());
     }
 
     public void onClickNumber(View v) {

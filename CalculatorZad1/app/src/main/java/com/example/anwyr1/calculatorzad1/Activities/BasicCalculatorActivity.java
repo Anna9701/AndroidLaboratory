@@ -7,19 +7,34 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.anwyr1.calculatorzad1.R;
 import com.example.anwyr1.calculatorzad1.Services.AdvancedCalculator;
 import com.example.anwyr1.calculatorzad1.Services.BasicCalculator;
 
+import org.w3c.dom.Text;
+
 public class BasicCalculatorActivity extends AppCompatActivity {
     protected BasicCalculator calculator;
+    private final static String InputRestoreKey = "input";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_basic_calculator);
-        calculator = new BasicCalculator(findViewById(R.id.textView2), this);
+        TextView inputView = findViewById(R.id.textView2);
+        calculator = new BasicCalculator(inputView, this);
+        if (savedInstanceState != null) {
+            inputView.setText(savedInstanceState.getString(InputRestoreKey));
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle bundle) {
+        super.onSaveInstanceState(bundle);
+        TextView input = findViewById(R.id.textView2);
+        bundle.putString(InputRestoreKey, input.getText().toString());
     }
 
     public void onClickNumber(View v) {

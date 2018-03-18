@@ -74,6 +74,8 @@ public class InputtedNumber implements ICNumber {
 
     private void setNakedValue(String input) {
         value = Double.parseDouble(input);
+        if (!isMinus)
+            isMinus = value < 0;
     }
 
     @Override
