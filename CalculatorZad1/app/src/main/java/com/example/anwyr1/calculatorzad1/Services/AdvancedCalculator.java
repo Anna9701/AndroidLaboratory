@@ -18,12 +18,14 @@ public class AdvancedCalculator extends BasicCalculator {
     }
 
     public void handleSquarePower() {
-        if (!(textView.getText().length() > 0)) return;
+        if (!(textView.getText().length() > 0)) {
+            showAlert("Error", "Faulty operation requested.");
+            return;
+        }
         handleOperator("^");
         textView.append("2");
     }
 
-    //TODO not working!!!!!!!!!!!!!!!
     public void handleUnaryOperator(String operator) {
         if (resultPrinted) {
             clearInput();
@@ -31,7 +33,10 @@ public class AdvancedCalculator extends BasicCalculator {
         }
         String input = textView.getText().toString();
         if (input.length() > 0 && Character.isDigit(input.charAt(input.length() - 1)) &&
-                input.charAt(input.length() - 1) != ')') return;
+                input.charAt(input.length() - 1) != ')') {
+            showAlert("Error", "Faulty operation requested.");
+            return;
+        }
         textView.append(operator);
     }
 
@@ -54,17 +59,20 @@ public class AdvancedCalculator extends BasicCalculator {
 
     @Override
     public void summarize() {
-        if (textView.getText().length() == 0) return;
+        if (textView.getText().length() == 0) {
+            showAlert("Error", "Faulty operation requested.");
+            return;
+        }
         final double PERCENT_BASE = 100;
         List<ICNumber> numbers = getInputNumbersSplitted();
         String operators = getInputOperators();
         if (numbers.size() == 0 || operators.length() == 0 && !numbers.get(0).isPercent() && !numbers.get(0).hasUnaryOperator()) {
+            showAlert("Error", "Faulty operation requested.");
             return;
         } else if (operators.length() == 0 && numbers.get(0).isPercent()) {
             textView.setText(String.valueOf(numbers.get(0).getValue() / PERCENT_BASE));
             resultPrinted = true;
             return;
-
         }
 
         ICNumber resultNumber = numbers.get(0);
@@ -97,5 +105,11 @@ public class AdvancedCalculator extends BasicCalculator {
             }
         }
         return operators.toString();
+    }
+
+    //TODO backspace in case of sqrt, log etc.
+    @Override
+    public void handleBackspace() {
+
     }
 }

@@ -46,12 +46,17 @@ public class BasicCalculator {
     public void handleDotInput() {
         String inputs[] = getInputTextSplitted();
         if (inputs == null) {
+            showAlert("Error", "Faulty operation requested.");
             return;
         }
         String lastNumber = inputs[inputs.length - 1];
         if (!lastNumber.contains(".")) {
             if (Character.isDigit(lastNumber.charAt(lastNumber.length() - 1)))
                 textView.append(".");
+            else
+                showAlert("Error", "Faulty operation requested.");
+        } else {
+            showAlert("Error", "Faulty operation requested.");
         }
     }
 
@@ -81,7 +86,10 @@ public class BasicCalculator {
 
     //TODO Consider operators order
     public void summarize() {
-        if (textView.getText().length() == 0) return;
+        if (textView.getText().length() == 0) {
+            showAlert("Error", "Faulty operation requested.");
+            return;
+        }
         final double PERCENT_BASE = 100;
         List<ICNumber> numbers = getInputNumbersSplitted();
         String operators = getInputOperators();
@@ -127,7 +135,10 @@ public class BasicCalculator {
 
     public void handleChangSignOperator() {
         String input = textView.getText().toString();
-        if (input.length() == 0) return;
+        if (input.length() == 0) {
+            showAlert("Error", "Faulty operation requested.");
+            return;
+        }
         input = input.replace("-", " -");
         input = input.replace("( ", "(");
         String[] splitted = input.split("[^(\\-0-9.%)]");
@@ -153,7 +164,6 @@ public class BasicCalculator {
         textView.append(splitted);
     }
 
-    //TODO check commented lines
     protected void changeIntoPositive(String input, String splitted) {
         if (splitted.contains("(-")) {
             textView.setText(input.subSequence(0, input.length() - splitted.length()));
@@ -161,20 +171,19 @@ public class BasicCalculator {
             textView.append(splitted);
         } else {
             textView.setText(input.subSequence(0, input.length() - splitted.length()));
-           // if (textView.getText().length() == 0)
-            //    splitted = splitted.substring(1);
-            //else
                 splitted = "+" + splitted.substring(1);
             textView.append(splitted);
         }
     }
 
-
     public void handleOperator(String operator) {
         if (resultPrinted)
             resultPrinted = false;
         String input = textView.getText().toString();
-        if (input.length() == 0) return;
+        if (input.length() == 0) {
+            showAlert("Error", "Faulty operation requested.");
+            return;
+        }
         char lastCharacter = input.charAt(input.length() - 1);
         if (Character.isDigit(lastCharacter) || lastCharacter == '%' && !operator.equals("%") || lastCharacter == ')')
             textView.append(operator);
