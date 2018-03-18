@@ -107,9 +107,15 @@ public class AdvancedCalculator extends BasicCalculator {
         return operators.toString();
     }
 
-    //TODO backspace in case of sqrt, log etc.
     @Override
     public void handleBackspace() {
-
+        String input = textView.getText().toString();
+        if(input.matches(".*[a-z]+")) {
+            while(input.length() > 0 && Character.isLetter(input.charAt(input.length() - 1))) {
+                input = input.substring(0, input.length() - 1);
+            }
+            textView.setText(input);
+        } else
+            super.handleBackspace();
     }
 }

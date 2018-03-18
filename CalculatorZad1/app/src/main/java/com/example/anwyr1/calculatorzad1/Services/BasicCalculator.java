@@ -188,12 +188,15 @@ public class BasicCalculator {
         if (Character.isDigit(lastCharacter) || lastCharacter == '%' && !operator.equals("%") || lastCharacter == ')')
             textView.append(operator);
     }
-
+    
     public void handleBackspace() {
-        CharSequence inputtedText = textView.getText();
+        String inputtedText = textView.getText().toString();
         int length = inputtedText.length();
-        if (length > 0)
+        if (length > 0 && inputtedText.endsWith(")")) {
+            textView.setText(inputtedText.subSequence(0, inputtedText.lastIndexOf("(")));
+        } else {
             textView.setText(inputtedText.subSequence(0, length - 1));
+        }
     }
 
     protected void showAlert(String title, String content) {
