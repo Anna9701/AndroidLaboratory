@@ -90,19 +90,12 @@ public class BasicCalculator {
             showAlert("Error", "Faulty operation requested.");
             return;
         }
-        final double PERCENT_BASE = 100;
         List<ICNumber> numbers = getInputNumbersSplitted();
         String operators = getInputOperators();
         if (numbers.size() == 0 || operators.length() == 0 && !numbers.get(0).isPercent()) {
             showAlert("Error", "Faulty operation requested.");
             return;
         }
-//        } else if (operators.length() == 0 && numbers.get(0).isPercent()) {
-//            textView.setText(String.valueOf(numbers.get(0).getValue() / PERCENT_BASE));
-//            resultPrinted = true;
-//            return;
-//
-//        }
 
         ICNumber resultNumber = numbers.get(0);
         for (int i = 1; i <= operators.length(); ++i) {
