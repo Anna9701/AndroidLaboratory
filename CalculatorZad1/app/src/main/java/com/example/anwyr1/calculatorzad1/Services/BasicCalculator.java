@@ -70,7 +70,7 @@ public class BasicCalculator {
         if(inputted.length() > 0) {
             inputted = inputted.replace("-", " -");
             inputted = inputted.replace("( ", "(");
-            splitted = inputted.split("[^(\\-0-9.%)]");
+            splitted = inputted.split("[^(\\-0-9a-z.%)]");
         }
         for (String s : splitted) {
             if (s.length() > 0)
@@ -85,7 +85,7 @@ public class BasicCalculator {
         final double PERCENT_BASE = 100;
         List<ICNumber> numbers = getInputNumbersSplitted();
         String operators = getInputOperators();
-        if (numbers.size() == 0 || operators.length() == 0 && !numbers.get(0).isPercent()) {
+        if (numbers.size() == 0 || operators.length() == 0 && !numbers.get(0).isPercent() && !numbers.get(0).hasUnaryOperator()) {
             return;
         } else if (operators.length() == 0 && numbers.get(0).isPercent()) {
             textView.setText(String.valueOf(numbers.get(0).getValue() / PERCENT_BASE));
@@ -114,6 +114,7 @@ public class BasicCalculator {
                 case '+':
                 case '*':
                 case '/':
+                case '^':
                     operators.append(inputtedChar);
                     break;
                 case '-':

@@ -58,4 +58,10 @@ public class AdvancedCalculatorActivity extends AppCompatActivity {
     public void onPowerClick(View v) {
         calculator.handleOperator(String.valueOf(POWER_OPERATOR));
     }
+
+    public void onUnaryOperatorClick(View v) {
+        Button b = (Button) v;
+        String operator = b.getText().toString();
+        calculator.handleUnaryOperator(operator);
+    }
 }

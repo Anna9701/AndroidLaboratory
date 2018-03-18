@@ -17,4 +17,16 @@ public class AdvancedCalculator extends BasicCalculator {
         handleOperator("^");
         textView.append("2");
     }
+
+    //TODO not working!!!!!!!!!!!!!!!
+    public void handleUnaryOperator(String operator) {
+        if (resultPrinted) {
+            clearInput();
+            resultPrinted = false;
+        }
+        String input = textView.getText().toString();
+        if (input.length() > 0 && Character.isDigit(input.charAt(input.length() - 1)) &&
+                input.charAt(input.length() - 1) != ')') return;
+        textView.append(operator);
+    }
 }

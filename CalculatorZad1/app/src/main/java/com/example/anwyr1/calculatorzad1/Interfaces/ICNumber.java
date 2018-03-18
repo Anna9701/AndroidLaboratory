@@ -14,4 +14,6 @@ public interface ICNumber {
     boolean isPercent();
 
     void setValue(double value);
+
+    boolean hasUnaryOperator();
 }
