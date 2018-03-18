@@ -85,6 +85,10 @@ public class InputtedNumber implements ICNumber {
 
     @Override
     public double getValue() {
+        if (isMinus)
+            value = -value;
+        if (isPercent)
+            value /= PERCENT_DIVIDER;
         return value;
     }
 
@@ -106,16 +110,6 @@ public class InputtedNumber implements ICNumber {
     static public double countResult(final ICNumber first, final ICNumber second, final char action) {
         double firstValue = first.getValue();
         double secondValue = second.getValue();
-        if (first.isPercent()) {
-            firstValue = first.getValue() / PERCENT_DIVIDER;
-        }
-        if (second.isPercent()) {
-            secondValue = firstValue * secondValue / PERCENT_DIVIDER;
-        }
-        if (first.isMinus())
-            firstValue = -(firstValue);
-        if (second.isMinus())
-            secondValue = -(secondValue);
         return count(firstValue, secondValue, action);
     }
 
