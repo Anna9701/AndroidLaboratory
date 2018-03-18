@@ -92,7 +92,7 @@ public class BasicCalculator {
         }
         List<ICNumber> numbers = getInputNumbersSplitted();
         String operators = getInputOperators();
-        if (numbers.size() == 0 && operators.length() == 0 && !numbers.get(0).isPercent()) {
+        if (numbers.size() == 0 || operators.length() == 0 && !numbers.get(0).isPercent()) {
             showAlert("Error", "Faulty operation requested.");
             return;
         }
