@@ -7,6 +7,7 @@ import com.example.anwyr1.calculatorzad1.Interfaces.ICNumber;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * Created by anwyr1 on 13/03/2018.
@@ -71,9 +72,12 @@ public class AdvancedCalculator extends BasicCalculator {
         }
 
         ReversePolishNotationConverter reversePolishNotationConverter = new ReversePolishNotationConverter();
-        reversePolishNotationConverter.convertToReversePolishNotationSequence(textView.getText().toString());
+        Queue<RPNSCharacter> characters = reversePolishNotationConverter.convertToReversePolishNotationSequence(textView.getText().toString());
+        ReversePolishNotationCounter reversePolishNotationCounter = new ReversePolishNotationCounter();
+        Double result = reversePolishNotationCounter.countResult(characters);
+        textView.setText(String.valueOf(result));
 
-       // textView.setText(String.valueOf(resultNumber.getValue()));
+        resultPrinted = true;
         resultPrinted = true;
     }
 

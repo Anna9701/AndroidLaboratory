@@ -1,12 +1,10 @@
 package com.example.anwyr1.calculatorzad1.Services;
 
 import com.example.anwyr1.calculatorzad1.Interfaces.IReversePolishNotationConverter;
-import com.example.anwyr1.calculatorzad1.Interfaces.Priority;
 
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by anwyr1 on 22/03/2018.
@@ -19,11 +17,12 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
     public Queue<RPNSCharacter> convertToReversePolishNotationSequence(String input) {
         Queue<RPNSCharacter> sequence = new LinkedList<>();
         Stack<Operator> stack = new Stack<>();
+        boolean fistNumber = true;
         while(input.length() > 0) {
             if (Character.isLetter(input.charAt(0))) { //handle sqrt, log, ln, etc. and convert to it's value
                 input = handleFunction(input);
             }
-            if (checkIfOperator(input.charAt(0))) { // handle operator input
+            if (isOperator(input.charAt(0)) && !fistNumber) { // handle operator input
                 Operator operator = new Operator(input.charAt(0));
                 if (stack.empty() || operator.getPriority().ordinal() > stack.peek().getPriority().ordinal()) {
                     stack.push(operator);
@@ -46,16 +45,17 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
                     sequence.add(new RPNSCharacter(number));
                     continue;
                 }
-                if (checkIfEndNumber(input)) {
+                if (isEndNumber(input)) {
                     number = Double.parseDouble(input);
                     input = "";
                 } else {
-                    while (!checkIfOperator(input.charAt(++i))) ;
+                    while (!isOperator(input.charAt(++i))) ;
                     number = Double.parseDouble(input.substring(0, i));
                     input = input.substring(i, input.length());
                 }
                 sequence.add(new RPNSCharacter(number));
             }
+            fistNumber = false;
         }
 
         while (!stack.empty()) {
@@ -65,9 +65,10 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
         return sequence;
     }
 
-    private boolean checkIfEndNumber (String input) {
-        for (int i = 0; i < input.length(); ++i) {
-            if (!Character.isDigit(input.charAt(i)))
+    private boolean isEndNumber(String input) {
+        for (int i = 1; i < input.length(); ++i) {
+            if (isOperator(input.charAt(i)))
+                if (!(input.charAt(i - 1) == '('))
                 return false;
         }
         return true;
@@ -75,18 +76,33 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
 
     private String handleFunction(String input) {
         int i = 0;
-        while (!(checkIfOperator(input.charAt(++i)))) ;
-        String number = input.substring(0, i);
-        number = countValue(number);
-        input = number + input.substring(i, input.length());
+        if (!isEndNumber(input)) {
+            for(i = 0; i < input.length(); ++i) {
+                if (isOperator(input.charAt(i)))
+                    if (!(input.charAt(i - 1) == '('))
+                        break;
+            }
+            String number = input.substring(0, i);
+            number = countValue(number);
+            input = number + input.substring(i, input.length());
+        } else {
+            input = countValue(input);
+        }
         return input;
     }
 
     private String countValue(String number) {
-        int i = 0;
-        while (!(Character.isDigit(++i)));
-        String function = number.substring(0, i);
-        String functionValue = number.substring(i, number.length());
+        int i = 1;
+        int j = 0;
+        while (i < number.length() && !(Character.isDigit(number.charAt(i++))));
+        String function = number.substring(0, --i);
+        String functionValue = "";
+        if (function.endsWith("(-")) {
+            functionValue += '-';
+            function = function.substring(0, function.indexOf("(-"));
+            ++j;
+        }
+        functionValue += number.substring(i, number.length() - j);
         return countFunction(function, functionValue);
     }
 
@@ -114,13 +130,13 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
         return String.valueOf(value);
     }
 
-    private boolean checkIfOperator(char c) {
+    private boolean isOperator(char c) {
         switch (c) {
             case '+':
-            case '-':
             case '*':
             case '^':
             case '/':
+            case '-':
                 return true;
         }
 
