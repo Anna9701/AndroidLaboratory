@@ -1,6 +1,7 @@
 package com.example.anwyr1.calculatorzad1.Services;
 
 import com.example.anwyr1.calculatorzad1.Activities.Main2Activity;
+import com.example.anwyr1.calculatorzad1.Interfaces.Action;
 import com.example.anwyr1.calculatorzad1.Interfaces.ICNumber;
 
 import java.util.UnknownFormatConversionException;
@@ -15,6 +16,10 @@ public class InputtedNumber implements ICNumber {
     private boolean isPercent = false;
     private boolean hasUnaryOperator = false;
     final static int PERCENT_DIVIDER = 100;
+
+    public InputtedNumber() {
+        value = 0;
+    }
 
     public InputtedNumber (String input) {
         if (input.contains("%")) {
@@ -107,23 +112,23 @@ public class InputtedNumber implements ICNumber {
         return isPercent;
     }
 
-    static public double countResult(final ICNumber first, final ICNumber second, final char action) {
+    static public double countResult(final ICNumber first, final ICNumber second, final Action action) {
         double firstValue = first.getValue();
         double secondValue = second.getValue();
         return count(firstValue, secondValue, action);
     }
 
-    static private double count(final double first, final double second, final char action) {
+    static private double count(final double first, final double second, final Action action) {
         switch (action) {
-            case '+':
+            case Addition:
                 return first + second;
-            case '-':
+            case Subtraction:
                 return first - second;
-            case '*':
+            case Multiplication:
                 return first * second;
-            case '/':
+            case Division:
                 return first / second;
-            case '^':
+            case Power:
                 return Math.pow(first, second);
         }
         throw new UnknownFormatConversionException("Wrong operator " + action);

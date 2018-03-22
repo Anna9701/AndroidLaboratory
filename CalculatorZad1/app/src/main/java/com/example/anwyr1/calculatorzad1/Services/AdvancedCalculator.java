@@ -70,13 +70,10 @@ public class AdvancedCalculator extends BasicCalculator {
             return;
         }
 
-        ICNumber resultNumber = numbers.get(0);
-        for (int i = 1; i <= operators.length(); ++i) {
-            char action = operators.charAt(i - 1);
-            resultNumber.setValue(InputtedNumber.countResult(resultNumber, numbers.get(i), action));
-        }
+        ReversePolishNotationConverter reversePolishNotationConverter = new ReversePolishNotationConverter();
+        reversePolishNotationConverter.convertToReversePolishNotationSequence(textView.getText().toString());
 
-        textView.setText(String.valueOf(resultNumber.getValue()));
+       // textView.setText(String.valueOf(resultNumber.getValue()));
         resultPrinted = true;
     }
 
