@@ -34,11 +34,16 @@ public class AdvancedCalculator extends BasicCalculator {
         }
         String input = textView.getText().toString();
         if (input.length() > 0 && Character.isDigit(input.charAt(input.length() - 1)) &&
-                input.charAt(input.length() - 1) != ')') {
+                input.charAt(input.length() - 1) != ')' || endsWithUnaryOperator(input)) {
             showAlert("Error", "Faulty operation requested.");
             return;
         }
         textView.append(operator);
+    }
+
+    private boolean endsWithUnaryOperator(String string) {
+        return string.endsWith("sin") || string.endsWith("cos") || string.endsWith("tan") ||
+                string.endsWith("ln") || string.endsWith("sqrt") || string.endsWith("log");
     }
 
     @Override
