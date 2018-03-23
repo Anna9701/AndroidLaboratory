@@ -1,16 +1,18 @@
 package com.example.anwyr1.calculatorzad1.Services;
 
+import com.example.anwyr1.calculatorzad1.Interfaces.IRPNSCharacter;
+
 /**
  * Created by anwyr1 on 22/03/2018.
  */
 
-public class RPNSCharacter {
-    private Double number;
+public class RPNSCharacter implements IRPNSCharacter {
+    private double number;
     private char operator;
     private boolean isOperator = false;
     private boolean isNumber = false;
 
-    public RPNSCharacter(Double value) {
+    public RPNSCharacter(double value) {
         this.number = value;
         isNumber = true;
     }
@@ -24,7 +26,7 @@ public class RPNSCharacter {
         return isNumber;
     }
 
-    public Double getNumber() {
+    public double getNumber() {
         return number;
     }
 

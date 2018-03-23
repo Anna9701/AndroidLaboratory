@@ -1,12 +1,13 @@
 package com.example.anwyr1.calculatorzad1.Services;
 
+import com.example.anwyr1.calculatorzad1.Interfaces.ICOperator;
 import com.example.anwyr1.calculatorzad1.Interfaces.Priority;
 
 /**
  * Created by anwyr1 on 22/03/2018.
  */
 
-public class Operator {
+public class Operator implements ICOperator {
     private char action;
     private Priority priority;
 

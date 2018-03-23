@@ -1,4 +1,4 @@
-package com.example.anwyr1.calculatorzad1.Services;
+package com.example.anwyr1.calculatorzad1.Exceptions;
 
 /**
  * Created by anwyr1 on 21/03/2018.

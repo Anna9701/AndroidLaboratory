@@ -2,19 +2,10 @@ package com.example.anwyr1.calculatorzad1.Services;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ComponentName;
 import android.content.DialogInterface;
-import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.anwyr1.calculatorzad1.Activities.AdvancedCalculatorActivity;
-import com.example.anwyr1.calculatorzad1.Activities.BasicCalculatorActivity;
-import com.example.anwyr1.calculatorzad1.Activities.Main2Activity;
-import com.example.anwyr1.calculatorzad1.Interfaces.ICNumber;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Queue;
 
 /**
@@ -69,31 +60,8 @@ public class BasicCalculator {
         return null;
     }
 
-    protected ArrayList<ICNumber> getInputNumbersSplitted() {
-        String inputted = textView.getText().toString();
-        String splitted[] = {""};
-        ArrayList<ICNumber> numbers = new ArrayList<>();
-        if(inputted.length() > 0) {
-            inputted = inputted.replace("-", " -");
-            inputted = inputted.replace("( ", "(");
-            splitted = inputted.split("[^(\\-0-9.%)]");
-        }
-        for (String s : splitted) {
-            if (s.length() > 0)
-                numbers.add(new InputtedNumber(s));
-        }
-        return numbers;
-    }
-
-    //TODO Consider operators order
     public void summarize() {
         if (textView.getText().length() == 0) {
-            showAlert("Error", "Faulty operation requested.");
-            return;
-        }
-        List<ICNumber> numbers = getInputNumbersSplitted();
-        String operators = getInputOperators();
-        if (numbers.size() == 0 || operators.length() == 0 && !numbers.get(0).isPercent()) {
             showAlert("Error", "Faulty operation requested.");
             return;
         }
@@ -103,28 +71,8 @@ public class BasicCalculator {
         ReversePolishNotationCounter reversePolishNotationCounter = new ReversePolishNotationCounter();
         Double result = reversePolishNotationCounter.countResult(characters);
         textView.setText(String.valueOf(result));
-        resultPrinted = true;
-    }
 
-    @NonNull
-    protected String getInputOperators() {
-        CharSequence inputted = textView.getText();
-        StringBuilder operators = new StringBuilder();
-        for (int i = 1; i < inputted.length(); ++i) {
-            char inputtedChar = inputted.charAt(i);
-            switch (inputtedChar) {
-                case '+':
-                case '*':
-                case '/':
-                    operators.append(inputtedChar);
-                    break;
-                case '-':
-                    if (Character.isDigit(inputted.charAt(i - 1)) || inputted.charAt(i - 1) == ')')
-                        operators.append(inputtedChar);
-                    break;
-            }
-        }
-        return operators.toString();
+        resultPrinted = true;
     }
 
     public void handleChangSignOperator() {
