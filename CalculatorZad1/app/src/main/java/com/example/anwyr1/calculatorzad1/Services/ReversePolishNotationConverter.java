@@ -40,27 +40,27 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
                 input = input.substring(1, input.length());
             } else { // handle number
                 int i = 0;
-                Double number;
-
-                if(input.startsWith("(")) {
+                double number;
+                if(input.startsWith("(")) {  //handle negative number
                     number = Double.parseDouble(input.substring(1, input.indexOf(")")));
                     input = input.substring(input.indexOf(")") + 1, input.length());
                     sequence.add(new RPNSCharacter(number));
                     continue;
                 }
-                if (isEndNumber(input)) {
-                    if (input.endsWith("%"))
+                if (isEndNumber(input)) { // handle last number of action
+                    if (input.endsWith("%")) {// handle percent number
                         number = Double.parseDouble(input.substring(0, input.length() - 1)) / 100;
-                    else
+                    } else {
                         number = Double.parseDouble(input);
-                    input = "";
+                    } input = "";
                 } else {
                     while (!isOperator(input.charAt(++i))) ;
                     String tmpString = input.substring(0, i);
-                    if (tmpString.endsWith("%"))
+                    if (tmpString.endsWith("%")) {// handle percent
                         number = Double.parseDouble(tmpString.substring(0, tmpString.length() - 1)) / 100;
-                    else
+                    } else { // handle normal number
                         number = Double.parseDouble(tmpString);
+                    }
                     input = input.substring(i, input.length());
                 }
                 sequence.add(new RPNSCharacter(number));
@@ -85,7 +85,7 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
     }
 
     private String handleFunction(String input) {
-        int i = 0;
+        int i;
         if (!isEndNumber(input)) {
             for(i = 0; i < input.length(); ++i) {
                 if (isOperator(input.charAt(i)))
