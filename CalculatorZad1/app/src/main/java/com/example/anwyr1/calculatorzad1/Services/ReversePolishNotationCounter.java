@@ -30,13 +30,13 @@ public class ReversePolishNotationCounter {
             case '+':
                 return a + b;
             case '-':
-                return a - b;
+                return b - a;
             case '*':
                 return a * b;
             case '/':
-                return a / b;
+                return b / a;
             case '^':
-                return Math.pow(a, b);
+                return Math.pow(b, a);
         }
 
         return 0.0;

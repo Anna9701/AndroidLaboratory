@@ -31,6 +31,8 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
                     while (operatorFromStack.getPriority().ordinal() >= operator.getPriority().ordinal()) {
                         operatorFromStack = stack.pop();
                         sequence.add(new RPNSCharacter(operatorFromStack.getActionSymbol()));
+                        if (stack.size() == 0)
+                            break;
                         operatorFromStack = stack.peek();
                     }
                     stack.push(operator);
@@ -39,6 +41,7 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
             } else { // handle number
                 int i = 0;
                 Double number;
+
                 if(input.startsWith("(")) {
                     number = Double.parseDouble(input.substring(1, input.indexOf(")")));
                     input = input.substring(input.indexOf(")") + 1, input.length());
@@ -46,11 +49,18 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
                     continue;
                 }
                 if (isEndNumber(input)) {
-                    number = Double.parseDouble(input);
+                    if (input.endsWith("%"))
+                        number = Double.parseDouble(input.substring(0, input.length() - 1)) / 100;
+                    else
+                        number = Double.parseDouble(input);
                     input = "";
                 } else {
                     while (!isOperator(input.charAt(++i))) ;
-                    number = Double.parseDouble(input.substring(0, i));
+                    String tmpString = input.substring(0, i);
+                    if (tmpString.endsWith("%"))
+                        number = Double.parseDouble(tmpString.substring(0, tmpString.length() - 1)) / 100;
+                    else
+                        number = Double.parseDouble(tmpString);
                     input = input.substring(i, input.length());
                 }
                 sequence.add(new RPNSCharacter(number));
