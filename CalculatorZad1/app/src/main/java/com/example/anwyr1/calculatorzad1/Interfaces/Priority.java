@@ -7,5 +7,6 @@ package com.example.anwyr1.calculatorzad1.Interfaces;
 public enum Priority {
     LOW,
     NORMAL,
-    HIGH
+    HIGH,
+    VERY_HIGH
 }

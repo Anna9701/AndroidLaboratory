@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.anwyr1.calculatorzad1.Interfaces.IRPNSCharacter;
+
 import java.util.Queue;
 
 /**
@@ -66,8 +68,9 @@ public class BasicCalculator {
             return;
         }
 
-        ReversePolishNotationConverter reversePolishNotationConverter = new ReversePolishNotationConverter();
-        Queue<RPNSCharacter> characters = reversePolishNotationConverter.convertToReversePolishNotationSequence(textView.getText().toString());
+        ReversePolishNotationConverter reversePolishNotationConverter = new ReversePolishNotationConverter(textView.getText().toString());
+        reversePolishNotationConverter.convertToReversePolishNotationSequence();
+        Queue<IRPNSCharacter> characters = reversePolishNotationConverter.getRPNSSequence();
         ReversePolishNotationCounter reversePolishNotationCounter = new ReversePolishNotationCounter();
         Double result = reversePolishNotationCounter.countResult(characters);
         textView.setText(String.valueOf(result));

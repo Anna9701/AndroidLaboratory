@@ -1,5 +1,7 @@
 package com.example.anwyr1.calculatorzad1.Services;
 
+import com.example.anwyr1.calculatorzad1.Interfaces.IRPNSCharacter;
+
 import java.util.Queue;
 import java.util.Stack;
 
@@ -9,9 +11,9 @@ import java.util.Stack;
 
 public class ReversePolishNotationCounter {
 
-    public double countResult(Queue<RPNSCharacter> rpnsCharacters) {
-        Stack<RPNSCharacter> stack = new Stack<>();
-        for (RPNSCharacter symbol : rpnsCharacters) {
+    public double countResult(Queue<IRPNSCharacter> rpnsCharacters) {
+        Stack<IRPNSCharacter> stack = new Stack<>();
+        for (IRPNSCharacter symbol : rpnsCharacters) {
             if (symbol.isNumber()) {
                 stack.push(symbol);
             } else {
@@ -25,7 +27,7 @@ public class ReversePolishNotationCounter {
         return stack.pop().getNumber();
     }
 
-    private Double countValue(double a, double b, char operator) {
+    private double countValue(double a, double b, char operator) {
         switch (operator) {
             case '+':
                 return a + b;

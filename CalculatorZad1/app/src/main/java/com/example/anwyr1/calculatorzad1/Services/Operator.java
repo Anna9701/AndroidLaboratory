@@ -29,6 +29,8 @@ public class Operator implements ICOperator {
             case '^':
                 priority = Priority.HIGH;
                 break;
+            case '%':
+                priority = Priority.VERY_HIGH;
         }
     }
 

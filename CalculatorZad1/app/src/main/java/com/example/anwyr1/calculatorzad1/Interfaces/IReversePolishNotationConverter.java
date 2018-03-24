@@ -9,5 +9,6 @@ import java.util.Queue;
  */
 
 public interface IReversePolishNotationConverter {
-    Queue<RPNSCharacter> convertToReversePolishNotationSequence(String input);
+    void convertToReversePolishNotationSequence();
+    Queue<IRPNSCharacter> getRPNSSequence();
 }

@@ -16,7 +16,7 @@ import com.example.anwyr1.calculatorzad1.Services.BasicCalculator;
 import org.w3c.dom.Text;
 
 public class BasicCalculatorActivity extends AppCompatActivity {
-    protected BasicCalculator calculator;
+    private BasicCalculator calculator;
     private final static String InputRestoreKey = "input";
 
     @Override

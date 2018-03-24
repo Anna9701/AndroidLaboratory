@@ -1,5 +1,7 @@
 package com.example.anwyr1.calculatorzad1.Services;
 
+import com.example.anwyr1.calculatorzad1.Interfaces.ICOperator;
+import com.example.anwyr1.calculatorzad1.Interfaces.IRPNSCharacter;
 import com.example.anwyr1.calculatorzad1.Interfaces.IReversePolishNotationConverter;
 
 import java.util.LinkedList;
@@ -13,29 +15,62 @@ import java.util.Stack;
 
 
 public class ReversePolishNotationConverter implements IReversePolishNotationConverter {
+    private Queue<IRPNSCharacter> sequence;
+    private Stack<Operator> operatorsStack;
+    private String input;
+    private boolean anyNumberConverted;
+    private static final double PERCENT_VALUE;
+    private static final ICOperator PERCENT;
+
+    static
+    {
+        PERCENT_VALUE = 0.01;
+        PERCENT = new Operator('%');
+    }
+
+    public ReversePolishNotationConverter(String input) {
+        sequence = new LinkedList<>();
+        operatorsStack = new Stack<>();
+        this.input = input;
+        anyNumberConverted = false;
+    }
+
     @Override
-    public Queue<RPNSCharacter> convertToReversePolishNotationSequence(String input) {
-        Queue<RPNSCharacter> sequence = new LinkedList<>();
-        Stack<Operator> stack = new Stack<>();
-        boolean fistNumber = true;
+    public void convertToReversePolishNotationSequence() {
         while(input.length() > 0) {
-            if (Character.isLetter(input.charAt(0))) { //handle sqrt, log, ln, etc. and convert to it's value
-                input = handleFunction(input);
+            char inputtedCharacter = input.charAt(0);
+            if (Character.isLetter(inputtedCharacter)) { //handle sqrt, log, ln, etc. and convert to it's value
+                input = handleMathematicalFunction(input);
             }
-            if (isOperator(input.charAt(0)) && !fistNumber) { // handle operator input
-                Operator operator = new Operator(input.charAt(0));
-                if (stack.empty() || operator.getPriority().ordinal() > stack.peek().getPriority().ordinal()) {
-                    stack.push(operator);
-                } else {
-                    Operator operatorFromStack = stack.peek();
-                    while (operatorFromStack.getPriority().ordinal() >= operator.getPriority().ordinal()) {
-                        operatorFromStack = stack.pop();
-                        sequence.add(new RPNSCharacter(operatorFromStack.getActionSymbol()));
-                        if (stack.size() == 0)
-                            break;
-                        operatorFromStack = stack.peek();
+            if (inputtedCharacter == PERCENT.getActionSymbol()) {
+                takeFirstCharFromInput();
+                double percentsNumber = sequence.poll().getNumber();
+                percentsNumber *= PERCENT_VALUE;// * sequence.peek().getNumber();
+                if (sequence.size() > 0) {
+                    if (this.operatorsStack.size() <= 0 || (operatorsStack.peek().getActionSymbol() != '*' &&
+                            operatorsStack.peek().getActionSymbol() != '/')) {
+                        percentsNumber *= sequence.peek().getNumber();
                     }
-                    stack.push(operator);
+                } else {
+                    percentsNumber *= 1;
+                }
+                sequence.add(new RPNSCharacter(percentsNumber));
+                continue;
+            }
+            if (isOperator(inputtedCharacter) && anyNumberConverted) { // handle operator input
+                Operator operator = new Operator(inputtedCharacter);
+                if (operatorsStack.empty() || operator.getPriority().ordinal() > operatorsStack.peek().getPriority().ordinal()) {
+                    operatorsStack.push(operator);
+                } else {
+                    Operator operatorFromStack = operatorsStack.peek();
+                    while (operatorFromStack.getPriority().ordinal() >= operator.getPriority().ordinal()) {
+                        operatorFromStack = operatorsStack.pop();
+                        sequence.add(new RPNSCharacter(operatorFromStack.getActionSymbol()));
+                        if (operatorsStack.size() == 0)
+                            break;
+                        operatorFromStack = operatorsStack.peek();
+                    }
+                    operatorsStack.push(operator);
                 }
                 input = input.substring(1, input.length());
             } else { // handle number
@@ -48,31 +83,41 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
                     continue;
                 }
                 if (isEndNumber(input)) { // handle last number of action
-                    if (input.endsWith("%")) {// handle percent number
-                        number = Double.parseDouble(input.substring(0, input.length() - 1)) / 100;
-                    } else {
-                        number = Double.parseDouble(input);
-                    } input = "";
+                //    if (input.endsWith("%")) {// handle percent number
+                  //      number = Double.parseDouble(input.substring(0, input.length() - 1)) / 100;
+                   // } else {
+                    number = Double.parseDouble(input);
+                    input = "";
                 } else {
                     while (!isOperator(input.charAt(++i))) ;
                     String tmpString = input.substring(0, i);
-                    if (tmpString.endsWith("%")) {// handle percent
-                        number = Double.parseDouble(tmpString.substring(0, tmpString.length() - 1)) / 100;
-                    } else { // handle normal number
+//                    if (tmpString.endsWith("%")) {// handle percent
+//                        number = Double.parseDouble(tmpString.substring(0, tmpString.length() - 1)) / 100;
+                   // } else { // handle normal number
                         number = Double.parseDouble(tmpString);
-                    }
+                   // }
                     input = input.substring(i, input.length());
                 }
                 sequence.add(new RPNSCharacter(number));
             }
-            fistNumber = false;
+            anyNumberConverted = true;
         }
 
-        while (!stack.empty()) {
-            sequence.add(new RPNSCharacter(stack.pop().getActionSymbol()));
+        while (!operatorsStack.empty()) {
+            sequence.add(new RPNSCharacter(operatorsStack.pop().getActionSymbol()));
         }
+    }
 
+    @Override
+    public Queue<IRPNSCharacter> getRPNSSequence() {
         return sequence;
+    }
+
+    private char takeFirstCharFromInput() {
+        final int firstCharacterIndex = 0;
+        final char firstCharacter = input.charAt(firstCharacterIndex);
+        input = input.substring(firstCharacterIndex + 1, input.length());
+        return firstCharacter;
     }
 
     private boolean isEndNumber(String input) {
@@ -84,7 +129,7 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
         return true;
     }
 
-    private String handleFunction(String input) {
+    private String handleMathematicalFunction(String input) {
         int i;
         if (!isEndNumber(input)) {
             for(i = 0; i < input.length(); ++i) {
@@ -93,15 +138,15 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
                         break;
             }
             String number = input.substring(0, i);
-            number = countValue(number);
+            number = prepareInputToCountMathematicalFunctionValue(number);
             input = number + input.substring(i, input.length());
         } else {
-            input = countValue(input);
+            input = prepareInputToCountMathematicalFunctionValue(input);
         }
         return input;
     }
 
-    private String countValue(String number) {
+    private String prepareInputToCountMathematicalFunctionValue(String number) {
         int i = 1;
         int j = 0;
         while (i < number.length() && !(Character.isDigit(number.charAt(i++))));
@@ -113,10 +158,10 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
             ++j;
         }
         functionValue += number.substring(i, number.length() - j);
-        return countFunction(function, functionValue);
+        return countMathematicalFunctionValue(function, functionValue);
     }
 
-    private String countFunction(String function, String functionValue) {
+    private String countMathematicalFunctionValue(String function, String functionValue) {
         double value = Double.parseDouble(functionValue);
         switch (function) {
             case "sqrt":
@@ -140,13 +185,14 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
         return String.valueOf(value);
     }
 
-    private boolean isOperator(char c) {
-        switch (c) {
+    private boolean isOperator(char character) {
+        switch (character) {
             case '+':
             case '*':
             case '^':
             case '/':
             case '-':
+            case '%':
                 return true;
         }
 
