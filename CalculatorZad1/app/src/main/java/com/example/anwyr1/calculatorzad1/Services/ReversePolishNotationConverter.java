@@ -8,10 +8,11 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
 
+import static com.example.anwyr1.calculatorzad1.Services.MathematicalNamesUtils.*;
+
 /**
  * Created by anwyr1 on 22/03/2018.
  */
-
 
 
 public class ReversePolishNotationConverter implements IReversePolishNotationConverter {
@@ -21,18 +22,25 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
     private boolean anyNumberConverted;
     private static final double PERCENT_VALUE;
     private static final ICOperator PERCENT;
+    private static final int PERCENT_BASE_NUMBER;
+    private static final String EMPTY_STRING = "";
 
     static
     {
         PERCENT_VALUE = 0.01;
-        PERCENT = new Operator('%');
+        PERCENT_BASE_NUMBER = 1;
+        PERCENT = new Operator(MathematicalNamesUtils.PERCENT_CHARACTER);
     }
 
-    public ReversePolishNotationConverter(String input) {
+    ReversePolishNotationConverter() {
         sequence = new LinkedList<>();
         operatorsStack = new Stack<>();
-        this.input = input;
+        this.input = EMPTY_STRING;
         anyNumberConverted = false;
+    }
+
+    public void setInput(final String input) {
+        this.input = input;
     }
 
     @Override
@@ -65,15 +73,15 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
     private void handleNumber() {
         int i = 0;
         double number;
-        if(input.startsWith("(")) {  //handle negative number
-            number = Double.parseDouble(input.substring(1, input.indexOf(")")));
-            input = input.substring(input.indexOf(")") + 1, input.length());
+        if(input.startsWith(String.valueOf(OPENING_BRACKET))) {  //handle negative number
+            number = Double.parseDouble(input.substring(1, input.indexOf(CLOSING_BRACKET)));
+            input = input.substring(input.indexOf(CLOSING_BRACKET) + 1, input.length());
             sequence.add(new RPNSCharacter(number));
             return;
         }
         if (isEndNumber(input)) { // handle last number of action
             number = Double.parseDouble(input);
-            input = "";
+            input = EMPTY_STRING;
         } else {
             while (!isOperator(input.charAt(++i))) ;
             String tmpString = input.substring(0, i);
@@ -102,14 +110,15 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
 
     private void handlePercent() {
         double percentsNumber = sequence.poll().getNumber();
-        percentsNumber *= PERCENT_VALUE;// * sequence.peek().getNumber();
+        percentsNumber *= PERCENT_VALUE;
         if (sequence.size() > 0) {
-            if (this.operatorsStack.size() <= 0 || (!operatorsStack.peek().getAction().isEquals('*') &&
-                    !operatorsStack.peek().getAction().isEquals('/'))) {
+            if (this.operatorsStack.size() <= 0 ||
+                    (!operatorsStack.peek().getAction().isEquals(POWER_OPERATOR)) &&
+                    !operatorsStack.peek().getAction().isEquals(DIVISION_OPERATOR)) {
                 percentsNumber *= sequence.peek().getNumber();
             }
         } else {
-            percentsNumber *= 1;
+            percentsNumber *= PERCENT_BASE_NUMBER;
         }
         sequence.add(new RPNSCharacter(percentsNumber));
         takeFirstCharFromInput();
@@ -125,7 +134,7 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
     private boolean isEndNumber(String input) {
         for (int i = 1; i < input.length(); ++i) {
             if (isOperator(input.charAt(i)))
-                if (!(input.charAt(i - 1) == '('))
+                if (!(input.charAt(i - 1) == OPENING_BRACKET))
                 return false;
         }
         return true;
@@ -136,7 +145,7 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
         if (!isEndNumber(input)) {
             for(i = 0; i < input.length(); ++i) {
                 if (isOperator(input.charAt(i)))
-                    if (!(input.charAt(i - 1) == '('))
+                    if (!(input.charAt(i - 1) == OPENING_BRACKET))
                         break;
             }
             String number = input.substring(0, i);
@@ -152,10 +161,10 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
         int j = 0;
         while (i < number.length() && !(Character.isDigit(number.charAt(i++))));
         String function = number.substring(0, --i);
-        String functionValue = "";
-        if (function.endsWith("(-")) {
-            functionValue += '-';
-            function = function.substring(0, function.indexOf("(-"));
+        String functionValue = EMPTY_STRING;
+        if (function.endsWith(String.valueOf(OPENING_BRACKET + MINUS_CHARACTER))) {
+            functionValue += MINUS_CHARACTER;
+            function = function.substring(0, function.indexOf(String.valueOf(OPENING_BRACKET + MINUS_CHARACTER)));
             ++j;
         }
         functionValue += number.substring(i, number.length() - j);
@@ -165,38 +174,28 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
     private String countMathematicalFunctionValue(String function, String functionValue) {
         double value = Double.parseDouble(functionValue);
         switch (function) {
-            case "sqrt":
+            case SQUARE_ROOT_NAME:
                 value = Math.sqrt(value);
                 break;
-            case "log":
+            case LOGARITHM_NAME:
                 value = Math.log10(value);
                 break;
-            case "sin":
+            case SINUS_NAME:
                 value = Math.sin(Math.toRadians(value));
                 break;
-            case "cos":
+            case COSINES_NAME:
                 value = Math.cos(Math.toRadians(value));
                 break;
-            case "ln":
+            case NATURAL_LOGARITHM_NAME:
                 value = Math.log(value);
                 break;
-            case "tan":
+            case TANGENT_NAME:
                 value = Math.tan(Math.toRadians(value));
         }
         return String.valueOf(value);
     }
 
     private boolean isOperator(char character) {
-        switch (character) {
-            case '+':
-            case '*':
-            case '^':
-            case '/':
-            case '-':
-            case '%':
-                return true;
-        }
-
-        return false;
+        return Operator.isOperator(character);
     }
 }

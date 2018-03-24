@@ -1,8 +1,8 @@
 package com.example.anwyr1.calculatorzad1.Services;
 
-import com.example.anwyr1.calculatorzad1.Interfaces.Action;
+import com.example.anwyr1.calculatorzad1.Enumerations.Action;
 import com.example.anwyr1.calculatorzad1.Interfaces.ICOperator;
-import com.example.anwyr1.calculatorzad1.Interfaces.Priority;
+import com.example.anwyr1.calculatorzad1.Enumerations.Priority;
 
 /**
  * Created by anwyr1 on 22/03/2018.
@@ -12,8 +12,8 @@ public class Operator implements ICOperator {
     private Action action;
     private Priority priority;
 
-    public Operator (char c) {
-        action = Action.convertToAction(c);
+    Operator (char operatorCharacter) {
+        action = Action.convertToAction(operatorCharacter);
         setPriority();
     }
 
@@ -41,5 +41,9 @@ public class Operator implements ICOperator {
 
     public Action getAction() {
         return action;
+    }
+
+    public static boolean isOperator(char character) {
+        return Action.convertToAction(character) != null;
     }
 }
