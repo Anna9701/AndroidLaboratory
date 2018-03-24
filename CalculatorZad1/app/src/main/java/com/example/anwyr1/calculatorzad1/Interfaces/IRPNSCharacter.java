@@ -8,5 +8,5 @@ public interface IRPNSCharacter {
     boolean isNumber();
     double getNumber();
     boolean isOperator();
-    char getOperator();
+    Action getOperator();
 }

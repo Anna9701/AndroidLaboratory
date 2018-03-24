@@ -6,5 +6,5 @@ package com.example.anwyr1.calculatorzad1.Interfaces;
 
 public interface ICOperator {
     Priority getPriority();
-    char getActionSymbol();
+    Action getAction();
 }

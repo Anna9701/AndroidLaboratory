@@ -1,5 +1,6 @@
 package com.example.anwyr1.calculatorzad1.Services;
 
+import com.example.anwyr1.calculatorzad1.Interfaces.Action;
 import com.example.anwyr1.calculatorzad1.Interfaces.IRPNSCharacter;
 
 import java.util.Queue;
@@ -27,17 +28,17 @@ public class ReversePolishNotationCounter {
         return stack.pop().getNumber();
     }
 
-    private double countValue(double a, double b, char operator) {
+    private double countValue(double a, double b, Action operator) {
         switch (operator) {
-            case '+':
+            case Addition:
                 return a + b;
-            case '-':
+            case Subtraction:
                 return b - a;
-            case '*':
+            case Multiplication:
                 return a * b;
-            case '/':
+            case Division:
                 return b / a;
-            case '^':
+            case Power:
                 return Math.pow(b, a);
         }
 

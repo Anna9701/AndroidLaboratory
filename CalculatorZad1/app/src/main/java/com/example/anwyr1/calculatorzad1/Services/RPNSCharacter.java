@@ -1,5 +1,6 @@
 package com.example.anwyr1.calculatorzad1.Services;
 
+import com.example.anwyr1.calculatorzad1.Interfaces.Action;
 import com.example.anwyr1.calculatorzad1.Interfaces.IRPNSCharacter;
 
 /**
@@ -8,7 +9,7 @@ import com.example.anwyr1.calculatorzad1.Interfaces.IRPNSCharacter;
 
 public class RPNSCharacter implements IRPNSCharacter {
     private double number;
-    private char operator;
+    private Action operator;
     private boolean isOperator = false;
     private boolean isNumber = false;
 
@@ -17,7 +18,7 @@ public class RPNSCharacter implements IRPNSCharacter {
         isNumber = true;
     }
 
-    public RPNSCharacter(char operator) {
+    public RPNSCharacter(Action operator) {
         this.operator = operator;
         isOperator = true;
     }
@@ -34,7 +35,7 @@ public class RPNSCharacter implements IRPNSCharacter {
         return isOperator;
     }
 
-    public char getOperator() {
+    public Action getOperator() {
         return operator;
     }
 }

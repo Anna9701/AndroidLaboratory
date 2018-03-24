@@ -42,7 +42,7 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
             if (Character.isLetter(inputtedCharacter)) {
                 handleMathematicalFunction();
             }
-            if (inputtedCharacter == PERCENT.getActionSymbol()) {
+            if (PERCENT.getAction().isEquals(inputtedCharacter)) {
                 handlePercent();
             } else if (isOperator(inputtedCharacter) && anyNumberConverted) {
                 handleOperator();
@@ -53,7 +53,7 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
         }
 
         while (!operatorsStack.empty()) {
-            sequence.add(new RPNSCharacter(operatorsStack.pop().getActionSymbol()));
+            sequence.add(new RPNSCharacter(operatorsStack.pop().getAction()));
         }
     }
 
@@ -91,7 +91,7 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
             Operator operatorFromStack = operatorsStack.peek();
             while (operatorFromStack.getPriority().ordinal() >= operator.getPriority().ordinal()) {
                 operatorFromStack = operatorsStack.pop();
-                sequence.add(new RPNSCharacter(operatorFromStack.getActionSymbol()));
+                sequence.add(new RPNSCharacter(operatorFromStack.getAction()));
                 if (operatorsStack.size() == 0)
                     break;
                 operatorFromStack = operatorsStack.peek();
@@ -104,8 +104,8 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
         double percentsNumber = sequence.poll().getNumber();
         percentsNumber *= PERCENT_VALUE;// * sequence.peek().getNumber();
         if (sequence.size() > 0) {
-            if (this.operatorsStack.size() <= 0 || (operatorsStack.peek().getActionSymbol() != '*' &&
-                    operatorsStack.peek().getActionSymbol() != '/')) {
+            if (this.operatorsStack.size() <= 0 || (!operatorsStack.peek().getAction().isEquals('*') &&
+                    !operatorsStack.peek().getAction().isEquals('/'))) {
                 percentsNumber *= sequence.peek().getNumber();
             }
         } else {

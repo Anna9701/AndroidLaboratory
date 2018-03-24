@@ -1,5 +1,6 @@
 package com.example.anwyr1.calculatorzad1.Services;
 
+import com.example.anwyr1.calculatorzad1.Interfaces.Action;
 import com.example.anwyr1.calculatorzad1.Interfaces.ICOperator;
 import com.example.anwyr1.calculatorzad1.Interfaces.Priority;
 
@@ -8,28 +9,28 @@ import com.example.anwyr1.calculatorzad1.Interfaces.Priority;
  */
 
 public class Operator implements ICOperator {
-    private char action;
+    private Action action;
     private Priority priority;
 
     public Operator (char c) {
-        action = c;
+        action = Action.convertToAction(c);
         setPriority();
     }
 
     private void setPriority()  {
         switch (action) {
-            case '+':
-            case '-':
+            case Addition:
+            case Subtraction:
                 priority = Priority.LOW;
                 break;
-            case '*':
-            case '/':
+            case Multiplication:
+            case Division:
                 priority = Priority.NORMAL;
                 break;
-            case '^':
+            case Power:
                 priority = Priority.HIGH;
                 break;
-            case '%':
+            case Percentage:
                 priority = Priority.VERY_HIGH;
         }
     }
@@ -38,7 +39,7 @@ public class Operator implements ICOperator {
         return priority;
     }
 
-    public char getActionSymbol() {
+    public Action getAction() {
         return action;
     }
 }
