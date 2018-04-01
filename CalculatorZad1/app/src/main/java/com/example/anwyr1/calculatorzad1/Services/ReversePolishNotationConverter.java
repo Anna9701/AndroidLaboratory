@@ -162,9 +162,9 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
         while (i < number.length() && !(Character.isDigit(number.charAt(i++))));
         String function = number.substring(0, --i);
         String functionValue = EMPTY_STRING;
-        if (function.endsWith(String.valueOf(OPENING_BRACKET + MINUS_CHARACTER))) {
+        if (function.endsWith(String.valueOf(OPENING_BRACKET) + String.valueOf(MINUS_CHARACTER))) {
             functionValue += MINUS_CHARACTER;
-            function = function.substring(0, function.indexOf(String.valueOf(OPENING_BRACKET + MINUS_CHARACTER)));
+            function = function.substring(0, function.indexOf(String.valueOf(OPENING_BRACKET) + String.valueOf(MINUS_CHARACTER)));
             ++j;
         }
         functionValue += number.substring(i, number.length() - j);

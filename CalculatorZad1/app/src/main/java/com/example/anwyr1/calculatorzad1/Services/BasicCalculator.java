@@ -88,47 +88,49 @@ public class BasicCalculator {
         resultPrinted = true;
     }
 
-    //TODO refactor changing sign
     public void handleChangSignOperator() {
         String input = textView.getText().toString();
+        final String isPositiveOrNegativeNumber = "[^(\\-0-9.%)]";
         if (input.length() == 0) {
-            showAlert("Error", "Faulty operation requested.");
+            showAlert(ERROR_ALERT_TITLE, ERROR_ALERT_DEFAULT_CONTENT);
             return;
         }
-        input = input.replace("-", " -");
-        input = input.replace("( ", "(");
-        String[] splitted = input.split("[^(\\-0-9.%)]");
-        int index = splitted.length;
+        input = input.replace(String.valueOf(MINUS_CHARACTER), String.valueOf(SPACE_CHARACTER) + String.valueOf(MINUS_CHARACTER));
+        input = input.replace(String.valueOf(OPENING_BRACKET) + String.valueOf(SPACE_CHARACTER), String.valueOf(OPENING_BRACKET));
+        String[] split = input.split(isPositiveOrNegativeNumber);
+        int index = split.length;
         if (index-- == 0 || !Character.isDigit(input.charAt(input.length() - 1)) &&
-                input.charAt(input.length() - 1) != ')') {
-            showAlert("Error", "Wrong format");
-            return; // Wrong format
+                input.charAt(input.length() - 1) != CLOSING_BRACKET) {
+            showAlert(ERROR_ALERT_TITLE, WRONG_FORMAT_ALERT_MESSAGE);
+            return;
         }
 
-        String number = splitted[index];
-        if(number.contains("-"))
+        String number = split[index];
+        if(number.contains(String.valueOf(MINUS_CHARACTER))) {
             changeIntoPositive(input, number);
-        else
-            changeIntoNegative(input, number);
-
-
-    }
-
-    protected void changeIntoNegative(String input, String splitted) {
-        textView.setText(input.subSequence(0, input.length() - splitted.length()));
-        splitted = "(-" + splitted + ")";
-        textView.append(splitted);
-    }
-
-    protected void changeIntoPositive(String input, String splitted) {
-        if (splitted.contains("(-")) {
-            textView.setText(input.subSequence(0, input.length() - splitted.length()));
-            splitted = splitted.substring("(-".length(), splitted.length() - ")".length());
-            textView.append(splitted);
         } else {
-            textView.setText(input.subSequence(0, input.length() - splitted.length()));
-            splitted = "+" + splitted.substring(1);
-            textView.append(splitted);
+            changeIntoNegative(input, number);
+        }
+
+    }
+
+    private void changeIntoNegative(String input, String split) {
+        textView.setText(input.subSequence(0, input.length() - split.length()));
+        split =   String.valueOf(OPENING_BRACKET) + String.valueOf(MINUS_CHARACTER)
+                + split + String.valueOf(CLOSING_BRACKET);
+        textView.append(split);
+    }
+
+    private void changeIntoPositive(String input, String split) {
+        if (split.contains(String.valueOf(OPENING_BRACKET) + String.valueOf(MINUS_CHARACTER))) {
+            textView.setText(input.subSequence(0, input.length() - split.length()));
+            split = split.substring((String.valueOf(OPENING_BRACKET) + String.valueOf(MINUS_CHARACTER)).length(),
+                    split.length() - String.valueOf(CLOSING_BRACKET).length());
+            textView.append(split);
+        } else {
+            textView.setText(input.subSequence(0, input.length() - split.length()));
+            split = String.valueOf(PLUS_CHARACTER) + split.substring(1);
+            textView.append(split);
         }
     }
 
