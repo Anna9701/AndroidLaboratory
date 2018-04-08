@@ -32,6 +32,26 @@ public enum Action {
         }
     }
 
+    @Override
+    public String toString() {
+        switch (this) {
+            case Addition:
+                return String.valueOf(PLUS_CHARACTER);
+            case Subtraction:
+                return String.valueOf(MINUS_CHARACTER);
+            case Division:
+                return String.valueOf(DIVISION_OPERATOR);
+            case Power:
+                return String.valueOf(POWER_OPERATOR);
+            case Multiplication:
+                return String.valueOf(MULTIPLICATION_OPERATOR);
+            case Percentage:
+                return String.valueOf(PERCENT_CHARACTER);
+            default:
+                return null;
+        }
+    }
+
     public boolean isEquals (char character) {
         Action temp = convertToAction(character);
         return this.equals(temp);

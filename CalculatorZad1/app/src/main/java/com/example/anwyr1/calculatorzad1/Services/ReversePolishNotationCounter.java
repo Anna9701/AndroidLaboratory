@@ -11,9 +11,12 @@ import java.util.Stack;
  */
 
 class ReversePolishNotationCounter {
+    static Action lastOperator;
+    static double lastNumber;
 
     double countResult(Queue<IRPNSCharacter> rpnsCharacters) {
         Stack<IRPNSCharacter> stack = new Stack<>();
+
         for (IRPNSCharacter symbol : rpnsCharacters) {
             if (symbol.isNumber()) {
                 stack.push(symbol);
@@ -21,11 +24,14 @@ class ReversePolishNotationCounter {
                 double a = stack.pop().getNumber();
                 double b = stack.pop().getNumber();
                 Double value = countValue (a, b, symbol.getOperator());
+                lastOperator = symbol.getOperator();
+                lastNumber = a;
                 stack.push(new RPNSCharacter(value));
             }
         }
 
-        return stack.pop().getNumber();
+        double resultNumber = stack.pop().getNumber();
+        return (double) Math.round(resultNumber * 100d) / 100d;
     }
 
     private double countValue(double a, double b, Action operator) {

@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 import java.util.Queue;
 
+import com.example.anwyr1.calculatorzad1.Enumerations.Action;
 import com.example.anwyr1.calculatorzad1.Interfaces.IRPNSCharacter;
 
 import static com.example.anwyr1.calculatorzad1.Services.MathematicalNamesUtils.*;
@@ -76,6 +77,13 @@ public class BasicCalculator {
         if (textView.getText().length() == 0) {
             showAlert(ERROR_ALERT_TITLE, ERROR_ALERT_DEFAULT_CONTENT);
             return;
+        }
+
+        if (resultPrinted) {
+            String inputted = textView.getText().toString();
+            inputted += ReversePolishNotationCounter.lastOperator;
+            inputted += ReversePolishNotationCounter.lastNumber;
+            textView.setText(inputted);
         }
 
         reversePolishNotationConverter.setInput(textView.getText().toString());
