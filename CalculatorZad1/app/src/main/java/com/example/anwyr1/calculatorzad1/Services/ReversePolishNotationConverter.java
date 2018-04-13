@@ -41,6 +41,8 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
 
     public void setInput(final String input) {
         this.input = input;
+        sequence = new LinkedList<>();
+        operatorsStack = new Stack<>();
     }
 
     @Override

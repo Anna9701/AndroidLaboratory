@@ -5,9 +5,10 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.view.View;
 import android.widget.TextView;
+
+import java.math.BigDecimal;
 import java.util.Queue;
 
-import com.example.anwyr1.calculatorzad1.Enumerations.Action;
 import com.example.anwyr1.calculatorzad1.Interfaces.IRPNSCharacter;
 
 import static com.example.anwyr1.calculatorzad1.Services.MathematicalNamesUtils.*;
@@ -44,6 +45,9 @@ public class BasicCalculator {
     }
 
     public void clearInput() {
+        resultPrinted = false;
+        ReversePolishNotationCounter.lastOperator = null;
+        ReversePolishNotationCounter.lastNumber = 0;
         textView.setText(EMPTY);
     }
 
@@ -79,7 +83,7 @@ public class BasicCalculator {
             return;
         }
 
-        if (resultPrinted) {
+        if (resultPrinted && ReversePolishNotationCounter.lastOperator != null) {
             String inputted = textView.getText().toString();
             inputted += ReversePolishNotationCounter.lastOperator;
             inputted += ReversePolishNotationCounter.lastNumber;
@@ -91,8 +95,12 @@ public class BasicCalculator {
 
         Queue<IRPNSCharacter> characters = reversePolishNotationConverter.getRPNSSequence();
         double result = reversePolishNotationCounter.countResult(characters);
-
-        textView.setText(String.valueOf(result));
+        if (result == 9.223372036854776E16) {
+            showAlert("MAX", "The number is too big. Clearing to 0");
+            result = 0;
+        }
+        String resultString = new BigDecimal(result).toPlainString();
+        textView.setText(resultString);
         resultPrinted = true;
     }
 
