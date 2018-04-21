@@ -21,8 +21,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/moonRiseName"
                 android:textSize="18sp" />
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
 
-            <TextView
+        <TextView
                 android:id="@+id/moonRise"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -41,8 +45,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/moonSetName"
                 android:textSize="18sp" />
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
 
-            <TextView
+        <TextView
                 android:id="@+id/moonSet"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -62,8 +70,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/nextNewMoonName"
                 android:textSize="18sp" />
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
 
-            <TextView
+        <TextView
                 android:id="@+id/nextNewMoon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -82,8 +94,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/nextFullMoonName"
                 android:textSize="18sp" />
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
 
-            <TextView
+        <TextView
                 android:id="@+id/nextFullMoon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -102,8 +118,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/illuminationName"
                 android:textSize="18sp" />
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
 
-            <TextView
+        <TextView
                 android:id="@+id/illumination"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -122,8 +142,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/monthAgeName"
                 android:textSize="18sp" />
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
 
-            <TextView
+        <TextView
                 android:id="@+id/monthAge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

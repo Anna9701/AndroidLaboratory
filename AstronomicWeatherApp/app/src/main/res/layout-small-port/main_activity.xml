@@ -27,14 +27,14 @@
         app:layout_constraintTop_toBottomOf="@+id/dataHeader">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <fragment
                 android:id="@+id/fragment4"
                 android:name="com.example.anwyr1.astronomicweatherapp.SunFragment"
-                android:layout_width="370dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="8dp"
                 android:layout_marginEnd="8dp"
@@ -49,7 +49,7 @@
             <fragment
                 android:id="@+id/fragment3"
                 android:name="com.example.anwyr1.astronomicweatherapp.MoonFragment"
-                android:layout_width="370dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="8dp"
                 android:layout_marginEnd="8dp"
