@@ -1,13 +1,9 @@
 package com.example.anwyr1.astronomicweatherapp;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -21,9 +17,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
-    private Timer timer;
-    private TimerTask timerTask;
-    private static final int MilisecondsInMinute = 1000;
+    private static final int MillisecondsInMinute = 1000;
     private static AstroCalculator astroCalculator;
     private static AstroCalculator.Location location;
     private static AstroDateTime astroDateTime;
@@ -32,10 +26,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setupCurrentTimeAndLocalization();
-        setupAstronimicData();
+        setupAstronomicData();
     }
 
     private void setupCurrentTimeAndLocalization() {
@@ -65,18 +59,16 @@ public class MainActivity extends AppCompatActivity {
         int hour = Calendar.getInstance().get(Calendar.HOUR);
         int minute = Calendar.getInstance().get(Calendar.MINUTE);
         int second = Calendar.getInstance().get(Calendar.SECOND);
-        int timezeoneOffset = Calendar.getInstance().get(Calendar.ZONE_OFFSET);
-        astroDateTime = new AstroDateTime(year, month, day, hour, minute, second, timezeoneOffset, false);
+        int timezoneOffset = Calendar.getInstance().get(Calendar.ZONE_OFFSET);
+        astroDateTime = new AstroDateTime(year, month, day, hour, minute, second, timezoneOffset, false);
         location = new AstroCalculator.Location(Double.parseDouble(latitude),
                 Double.parseDouble(longitude));
         astroCalculator = new AstroCalculator(astroDateTime, location);
     }
 
-    private void setupAstronimicData() {
-        updateAstroCalendar();
+    private void setupAstronomicData() {
         int time = Integer.parseInt(SettingsActivity.getFromSettings("sync_frequency", this));
-        time *= MilisecondsInMinute;
-        final Context context = this;
+        time *= MillisecondsInMinute;
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -111,13 +103,13 @@ public class MainActivity extends AppCompatActivity {
     private void loadMoonRelatedData() {
         AstroCalculator.MoonInfo moonInfo = astroCalculator.getMoonInfo();
         final TextView moonriseDate = findViewById(R.id.moonRise);
-        final TextView moonsetDate = findViewById(R.id.moonSet);
+        final TextView moonSetDate = findViewById(R.id.moonSet);
         final TextView nextNewMoon = findViewById(R.id.nextNewMoon);
         final TextView nextFullMoon = findViewById(R.id.nextFullMoon);
         final TextView illumination = findViewById(R.id.illumination);
         final TextView monthAge = findViewById(R.id.monthAge);
         moonriseDate.setText(moonInfo.getMoonrise().toString());
-        moonsetDate.setText(moonInfo.getMoonset().toString());
+        moonSetDate.setText(moonInfo.getMoonset().toString());
         nextNewMoon.setText(moonInfo.getNextNewMoon().toString());
         nextFullMoon.setText(moonInfo.getNextFullMoon().toString());
         illumination.setText(String.valueOf(moonInfo.getIllumination()));
