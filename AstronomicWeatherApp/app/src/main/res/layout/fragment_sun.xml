@@ -12,18 +12,33 @@
         android:layout_margin="2dp">
 
         <TableRow
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/textView16"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text="@string/sunriseName"
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/textView15"
+                android:id="@+id/sunriseTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textAlignment="textEnd"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/azimuthName"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/sunriseAzimuth"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="TextView"
@@ -39,11 +54,46 @@
                 android:id="@+id/textView14"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text="@string/sunsetName"
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/textView13"
+                android:id="@+id/sunsetTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textAlignment="textEnd"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/azimuthName"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/sunsetAzimuth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textAlignment="textEnd"
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/civilSunriseName"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/civilSunrise"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="TextView"
@@ -60,11 +110,11 @@
                 android:id="@+id/textView10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text="@string/civilSunsetName"
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/textView9"
+                android:id="@+id/civilSunset"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="TextView"

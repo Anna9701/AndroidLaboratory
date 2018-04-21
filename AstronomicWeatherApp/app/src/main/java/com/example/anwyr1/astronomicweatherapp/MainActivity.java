@@ -48,6 +48,10 @@ public class MainActivity extends AppCompatActivity {
         }, 0, 1000);
     }
 
+    private void setupAstronimicData() {
+
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

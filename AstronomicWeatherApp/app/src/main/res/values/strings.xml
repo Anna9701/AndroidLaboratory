@@ -85,4 +85,15 @@
     <string name="pref_title_longitude">Longitude</string>
     <string name="pref_default_display_latitude">51.7730971</string>
     <string name="pref_default_display_longitude">19.41055333</string>
+    <string name="sunriseName">Sunrise</string>
+    <string name="sunsetName">Sunset</string>
+    <string name="azimuthName">Azimuth</string>
+    <string name="civilSunriseName">Civil Sunrise</string>
+    <string name="civilSunsetName">Civil sunset</string>
+    <string name="moonRiseName">Moonrise</string>
+    <string name="moonSetName">Moonset</string>
+    <string name="nextNewMoonName">Next New Moon</string>
+    <string name="nextFullMoonName">Next Full Moon</string>
+    <string name="illuminationName">Illumination</string>
+    <string name="monthAgeName">Age</string>
 </resources>
