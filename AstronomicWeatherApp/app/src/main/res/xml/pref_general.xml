@@ -22,7 +22,7 @@
     <EditTextPreference
         android:capitalize="words"
         android:defaultValue="@string/pref_default_display_longitude"
-        android:inputType="numberDecimal"
+        android:inputType="textCapWords|numberDecimal"
         android:key="longitude"
         android:maxLines="1"
         android:selectAllOnFocus="true"

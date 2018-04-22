@@ -1,6 +1,7 @@
 package com.example.anwyr1.astronomicweatherapp;
 
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +11,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -20,6 +22,8 @@ import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
+
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.List;
 
@@ -81,7 +85,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         preference.setSummary(name);
                     }
                 }
-
+            } else if (preference instanceof EditTextPreference) {
+                if (!NumberUtils.isParsable(stringValue)
+                        || Double.parseDouble(stringValue) <= -75
+                        || Double.parseDouble(stringValue) >= 75) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(preference.getContext());
+                    builder.setTitle("Invalid Input");
+                    builder.setMessage("Something's gone wrong...");
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    builder.show();
+                    return false;
+                }
+                preference.setSummary(stringValue);
             } else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
@@ -184,6 +199,24 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class GeneralPreferenceFragment extends PreferenceFragment {
+        class OnGeneralPreferenceChangeListener implements Preference.OnPreferenceChangeListener {
+
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                Boolean rtnval = true;
+                if (!NumberUtils.isParsable((String)newValue)) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Invalid Input");
+                    builder.setMessage("Something's gone wrong...");
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    builder.show();
+                    rtnval = false;
+                }
+                return rtnval;
+
+            }
+        }
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -191,7 +224,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             setHasOptionsMenu(true);
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
+            // to their val n'
+            // ues. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
             bindPreferenceSummaryToValue(findPreference("latitude"));

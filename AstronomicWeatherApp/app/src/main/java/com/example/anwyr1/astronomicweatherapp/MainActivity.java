@@ -1,6 +1,8 @@
 package com.example.anwyr1.astronomicweatherapp;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,7 +18,8 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+        SunFragment.OnFragmentInteractionListener, MoonFragment.OnFragmentInteractionListener {
     private static final int MillisecondsInMinute = 1000;
     private static AstroCalculator astroCalculator;
     private static AstroCalculator.Location location;
@@ -34,8 +37,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupCurrentTimeAndLocalization() {
         final TextView textView = findViewById(R.id.dataHeader);
-        final String latitude = SettingsActivity.getFromSettings("latitude", this);
-        final String longitude = SettingsActivity.getFromSettings("longitude", this);
+        String tmp = SettingsActivity.getFromSettings("latitude", this);
+        if (tmp == null) {
+            tmp = getString(R.string.pref_default_display_latitude);
+        }
+        final String latitude = tmp;
+        tmp = SettingsActivity.getFromSettings("longitude", this);
+        if (tmp == null) {
+            tmp = getString(R.string.pref_default_display_longitude);
+        }
+        final String longitude = tmp;
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -51,8 +62,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateAstroCalendar() {
-        final String latitude = SettingsActivity.getFromSettings("latitude", this);
-        final String longitude = SettingsActivity.getFromSettings("longitude", this);
+        String latitude = SettingsActivity.getFromSettings("latitude", this);
+        if (latitude == null) {
+            latitude = getString(R.string.pref_default_display_latitude);
+        }
+        String longitude = SettingsActivity.getFromSettings("longitude", this);
+        if (longitude == null) {
+            longitude = getString(R.string.pref_default_display_longitude);
+        }
         int year = Calendar.getInstance().get(Calendar.YEAR);
         int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
         int day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
@@ -67,7 +84,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupAstronomicData() {
-        int time = Integer.parseInt(SettingsActivity.getFromSettings("sync_frequency", this));
+        String syncTimeString = SettingsActivity.getFromSettings("sync_frequency", this);
+        if (syncTimeString == null) {
+            syncTimeString = getString(R.string.pref_default_display_sync_time_value);
+        }
+        int time = Integer.parseInt(syncTimeString);
         time *= MillisecondsInMinute;
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -108,12 +129,20 @@ public class MainActivity extends AppCompatActivity {
         final TextView nextFullMoon = findViewById(R.id.nextFullMoon);
         final TextView illumination = findViewById(R.id.illumination);
         final TextView monthAge = findViewById(R.id.monthAge);
-        moonriseDate.setText(moonInfo.getMoonrise().toString());
-        moonSetDate.setText(moonInfo.getMoonset().toString());
-        nextNewMoon.setText(moonInfo.getNextNewMoon().toString());
-        nextFullMoon.setText(moonInfo.getNextFullMoon().toString());
-        illumination.setText(String.valueOf(moonInfo.getIllumination()));
-        monthAge.setText(String.valueOf(moonInfo.getAge()));
+        try {
+            moonriseDate.setText(moonInfo.getMoonrise().toString());
+            moonSetDate.setText(moonInfo.getMoonset().toString());
+            nextNewMoon.setText(moonInfo.getNextNewMoon().toString());
+            nextFullMoon.setText(moonInfo.getNextFullMoon().toString());
+            illumination.setText(String.valueOf(moonInfo.getIllumination()));
+            monthAge.setText(String.valueOf(moonInfo.getAge()));
+        } catch (NullPointerException ex) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Sync error");
+            builder.setMessage("Something's gone wrong...");
+            builder.setPositiveButton(android.R.string.ok, null);
+            builder.show();
+        }
     }
 
     @Override
@@ -136,5 +165,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }
