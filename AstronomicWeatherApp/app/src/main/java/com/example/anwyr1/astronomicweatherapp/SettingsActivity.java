@@ -39,9 +39,16 @@ import java.util.List;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
-    public static String getFromSettings(String key, Context context) {
+    public static String getFromSettings(String key, String defValue,  Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return preferences.getString(key, null);
+        return preferences.getString(key, defValue);
+    }
+
+    public static void setSettings(String key, String value, Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(key, value);
+        editor.apply();
     }
     /**
      * A preference value change listener that updates the preference's summary

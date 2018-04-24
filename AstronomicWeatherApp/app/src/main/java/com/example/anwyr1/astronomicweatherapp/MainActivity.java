@@ -1,6 +1,7 @@
 package com.example.anwyr1.astronomicweatherapp;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,10 +21,9 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements
         SunFragment.OnFragmentInteractionListener, MoonFragment.OnFragmentInteractionListener {
-    private static final int MillisecondsInMinute = 1000;
+    private static final int MillisecondsInSecond = 1000;
+    private static final int SecondsInMinute = 60;
     private static AstroCalculator astroCalculator;
-    private static AstroCalculator.Location location;
-    private static AstroDateTime astroDateTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,39 +37,30 @@ public class MainActivity extends AppCompatActivity implements
 
     private void setupCurrentTimeAndLocalization() {
         final TextView textView = findViewById(R.id.dataHeader);
-        String tmp = SettingsActivity.getFromSettings("latitude", this);
-        if (tmp == null) {
-            tmp = getString(R.string.pref_default_display_latitude);
-        }
-        final String latitude = tmp;
-        tmp = SettingsActivity.getFromSettings("longitude", this);
-        if (tmp == null) {
-            tmp = getString(R.string.pref_default_display_longitude);
-        }
-        final String longitude = tmp;
+        final Context context = this;
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 runOnUiThread(new TimerTask() {
                     @Override
                     public void run() {
+                        String latitude = SettingsActivity.getFromSettings("latitude",
+                                getString(R.string.pref_default_display_latitude), context);
+                        String longitude = SettingsActivity.getFromSettings("longitude",
+                                getString(R.string.pref_default_display_longitude), context);
                         Date currentTime = Calendar.getInstance().getTime();
                         textView.setText(String.format("%s, %s \n%s", latitude, longitude, currentTime.toString()));
                     }
                 });
             }
-        }, 0, 1000);
+        }, 0, MillisecondsInSecond);
     }
 
     private void updateAstroCalendar() {
-        String latitude = SettingsActivity.getFromSettings("latitude", this);
-        if (latitude == null) {
-            latitude = getString(R.string.pref_default_display_latitude);
-        }
-        String longitude = SettingsActivity.getFromSettings("longitude", this);
-        if (longitude == null) {
-            longitude = getString(R.string.pref_default_display_longitude);
-        }
+        String latitude = SettingsActivity.getFromSettings("latitude",
+                getString(R.string.pref_default_display_latitude), this);
+        String longitude = SettingsActivity.getFromSettings("longitude",
+                getString(R.string.pref_default_display_longitude), this);
         int year = Calendar.getInstance().get(Calendar.YEAR);
         int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
         int day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
@@ -77,19 +68,17 @@ public class MainActivity extends AppCompatActivity implements
         int minute = Calendar.getInstance().get(Calendar.MINUTE);
         int second = Calendar.getInstance().get(Calendar.SECOND);
         int timezoneOffset = Calendar.getInstance().get(Calendar.ZONE_OFFSET);
-        astroDateTime = new AstroDateTime(year, month, day, hour, minute, second, timezoneOffset, false);
-        location = new AstroCalculator.Location(Double.parseDouble(latitude),
+        AstroDateTime astroDateTime = new AstroDateTime(year, month, day, hour, minute, second, timezoneOffset, false);
+        AstroCalculator.Location location = new AstroCalculator.Location(Double.parseDouble(latitude),
                 Double.parseDouble(longitude));
         astroCalculator = new AstroCalculator(astroDateTime, location);
     }
 
     private void setupAstronomicData() {
-        String syncTimeString = SettingsActivity.getFromSettings("sync_frequency", this);
-        if (syncTimeString == null) {
-            syncTimeString = getString(R.string.pref_default_display_sync_time_value);
-        }
+        String syncTimeString = SettingsActivity.getFromSettings("sync_frequency",
+                getString(R.string.pref_default_display_sync_time_value), this);
         int time = Integer.parseInt(syncTimeString);
-        time *= MillisecondsInMinute;
+        time *= MillisecondsInSecond * SecondsInMinute;
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -139,10 +128,20 @@ public class MainActivity extends AppCompatActivity implements
         } catch (NullPointerException ex) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Sync error");
-            builder.setMessage("Something's gone wrong...");
+            builder.setMessage("Something's gone wrong... Restoring default longitude and latitude " +
+                    "values");
             builder.setPositiveButton(android.R.string.ok, null);
             builder.show();
+            restoreDefaultLatitudeAndLongitude();
         }
+    }
+
+    private void restoreDefaultLatitudeAndLongitude() {
+        SettingsActivity.setSettings("latitude",
+                getString(R.string.pref_default_display_latitude), this);
+        SettingsActivity.setSettings("longitude",
+                getString(R.string.pref_default_display_longitude), this);
+        setupAstronomicData();
     }
 
     @Override
