@@ -94,8 +94,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 }
             } else if (preference instanceof EditTextPreference) {
                 if (!NumberUtils.isParsable(stringValue)
-                        || Double.parseDouble(stringValue) <= -75
-                        || Double.parseDouble(stringValue) >= 75) {
+                        || Double.parseDouble(stringValue) <= -90
+                        || Double.parseDouble(stringValue) >= 90) {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(preference.getContext());
                     builder.setTitle("Invalid Input");
                     builder.setMessage("Something's gone wrong...");

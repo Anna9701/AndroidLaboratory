@@ -7,6 +7,13 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.astrocalculator.AstroCalculator;
+
+import java.sql.Time;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 /**
@@ -22,7 +29,8 @@ public class SunFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    private static final int MillisecondsInSecond = 1000;
+    private static Timer timer;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -89,6 +97,50 @@ public class SunFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onDestroy() {
+        timer.cancel();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        String syncTimeString = SettingsActivity.getFromSettings("sync_frequency",
+                getString(R.string.pref_default_display_sync_time_value), getContext());
+        int time = Integer.parseInt(syncTimeString);
+        time *= MillisecondsInSecond;
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(new TimerTask() {
+                    @Override
+                    public void run() {
+                        AstronomicCalculator.getInstance(getContext()).updateAstroCalendar(getContext());
+                        loadSunRelatedData();
+                    }
+                });
+            }
+        }, 0, time);
+    }
+
+    private void loadSunRelatedData() {
+        AstronomicCalculator astronomicCalculator = AstronomicCalculator.getInstance(getContext());
+        AstroCalculator.SunInfo sunInfo = astronomicCalculator.getAstroCalculator().getSunInfo();
+        final TextView sunriseDate = getView().findViewById(R.id.sunriseTime);
+        final TextView sunriseAzimuth = getView().findViewById(R.id.sunriseAzimuth);
+        final TextView sunsetDate = getView().findViewById(R.id.sunsetTime);
+        final TextView sunsetAzimuth = getView().findViewById(R.id.sunsetAzimuth);
+        final TextView civilSunrise = getView().findViewById(R.id.civilSunrise);
+        final TextView civilSunset = getView().findViewById(R.id.civilSunset);
+        sunriseDate.setText(sunInfo.getSunrise().toString());
+        sunriseAzimuth.setText(String.valueOf(sunInfo.getAzimuthRise()));
+        sunsetDate.setText(sunInfo.getSunset().toString());
+        sunsetAzimuth.setText(String.valueOf(sunInfo.getAzimuthSet()));
+        civilSunrise.setText(sunInfo.getTwilightMorning().toString());
+        civilSunset.setText(sunInfo.getTwilightEvening().toString());
     }
 
     /**
