@@ -14,6 +14,10 @@
         <!--/>-->
 
     <header
+    android:fragment="com.example.anwyr1.astronomicweatherapp.SettingsActivity$NotificationPreferenceFragment"
+    android:title="@string/pref_header_weather" />
+
+    <header
         android:fragment="com.example.anwyr1.astronomicweatherapp.SettingsActivity$DataSyncPreferenceFragment"
         android:icon="@drawable/ic_sync_black_24dp"
         android:title="@string/pref_header_data_sync" />

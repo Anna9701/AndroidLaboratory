@@ -41,10 +41,6 @@
         <item>5 minutes</item>
         <item>10 minutes</item>
         <item>15 minutes</item>
-        <!--<item>30 minutes</item>-->
-        <!--<item>1 hour</item>-->
-        <!--<item>3 hours</item>-->
-        <!--<item>6 hours</item>-->
     </string-array>
     <string-array name="pref_sync_frequency_values">
         <item>5</item>
@@ -52,23 +48,19 @@
         <item>300</item>
         <item>600</item>
         <item>900</item>
-        <!--<item>30</item>-->
-        <!--<item>60</item>-->
-        <!--<item>180</item>-->
-        <!--<item>360</item>-->
     </string-array>
 
-    <string-array name="list_preference_entries">
-        <item>Entry 1</item>
-        <item>Entry 2</item>
-        <item>Entry 3</item>
+    <string-array name="list_units">
+        <item>Celsius</item>
+        <item>Fahrenheits</item>
     </string-array>
 
-    <string-array name="list_preference_entry_values">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
+    <string-array name="list_preference_units">
+        <item>Celsius</item>
+        <item>Fahrenheits</item>
     </string-array>
+
+    <string name="pref_default_display_unit_value">Celsius</string>
 
     <string-array name="multi_select_list_preference_default_value" />
 
@@ -103,4 +95,6 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="pref_header_weather">Weather settings</string>
+    <string name="wether_unit_name">Unit</string>
 </resources>
