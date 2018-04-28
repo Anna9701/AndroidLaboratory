@@ -7,37 +7,29 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-
-import com.astrocalculator.AstroCalculator;
-
-import java.sql.Time;
-import java.util.Timer;
-import java.util.TimerTask;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link SunFragment.OnFragmentInteractionListener} interface
+ * {@link ForecastFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link SunFragment#newInstance} factory method to
+ * Use the {@link ForecastFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SunFragment extends Fragment {
+public class ForecastFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final int MillisecondsInSecond = 1000;
-    private static Timer timer;
+
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
-    public SunFragment() {
+    public ForecastFragment() {
         // Required empty public constructor
     }
 
@@ -47,11 +39,11 @@ public class SunFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment SunFragment.
+     * @return A new instance of fragment ForecastFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static SunFragment newInstance(String param1, String param2) {
-        SunFragment fragment = new SunFragment();
+    public static ForecastFragment newInstance(String param1, String param2) {
+        ForecastFragment fragment = new ForecastFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -72,7 +64,7 @@ public class SunFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sun, container, false);
+        return inflater.inflate(R.layout.fragment_forecast, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -96,53 +88,7 @@ public class SunFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        timer.cancel();
         mListener = null;
-    }
-
-    @Override
-    public void onDestroy() {
-        timer.cancel();
-        super.onDestroy();
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        String syncTimeString = SettingsActivity.getFromSettings("sync_frequency",
-                getString(R.string.pref_default_display_sync_time_value), getContext());
-        int time = Integer.parseInt(syncTimeString);
-        time *= MillisecondsInSecond;
-        timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (getActivity() != null) {
-                getActivity().runOnUiThread(new TimerTask() {
-                    @Override
-                    public void run() {
-                        AstronomicCalculator.getInstance(getContext()).updateAstroCalendar(getContext());
-                        loadSunRelatedData();
-                    }
-                });}
-            }
-        }, 0, time);
-    }
-
-    private void loadSunRelatedData() {
-        AstronomicCalculator astronomicCalculator = AstronomicCalculator.getInstance(getContext());
-        AstroCalculator.SunInfo sunInfo = astronomicCalculator.getAstroCalculator().getSunInfo();
-        final TextView sunriseDate = getView().findViewById(R.id.sunriseTime);
-        final TextView sunriseAzimuth = getView().findViewById(R.id.sunriseAzimuth);
-        final TextView sunsetDate = getView().findViewById(R.id.sunsetTime);
-        final TextView sunsetAzimuth = getView().findViewById(R.id.sunsetAzimuth);
-        final TextView civilSunrise = getView().findViewById(R.id.civilSunrise);
-        final TextView civilSunset = getView().findViewById(R.id.civilSunset);
-        sunriseDate.setText(sunInfo.getSunrise().toString());
-        sunriseAzimuth.setText(String.valueOf(sunInfo.getAzimuthRise()));
-        sunsetDate.setText(sunInfo.getSunset().toString());
-        sunsetAzimuth.setText(String.valueOf(sunInfo.getAzimuthSet()));
-        civilSunrise.setText(sunInfo.getTwilightMorning().toString());
-        civilSunset.setText(sunInfo.getTwilightEvening().toString());
     }
 
     /**

@@ -24,7 +24,9 @@ import java.util.TimerTask;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        MoonFragment.OnFragmentInteractionListener, SunFragment.OnFragmentInteractionListener {
+        MoonFragment.OnFragmentInteractionListener, SunFragment.OnFragmentInteractionListener,
+        ForecastFragment.OnFragmentInteractionListener,
+        ActualWeatherFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
