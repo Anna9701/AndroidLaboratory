@@ -8,7 +8,7 @@
         android:layout_height="wrap_content"
         android:defaultValue="@string/pref_default_display_unit_value"
         android:entries="@array/list_units"
-        android:entryValues="@array/list_units"
+        android:entryValues="@array/list_preference_units_values"
         android:key="@string/weather_units_key"
         android:title="@string/wether_unit_name" />
     <PreferenceCategory android:title="@string/pref_weather_cities_list_header">

@@ -53,15 +53,16 @@
     <string-array name="list_units">
         <item>Celsius</item>
         <item>Fahrenheits</item>
-    </string-array>
-
-    <string-array name="list_preference_units">
-        <item>Celsius</item>
-        <item>Fahrenheits</item>
         <item>Kelvin</item>
     </string-array>
 
-    <string name="pref_default_display_unit_value">Celsius</string>
+    <string-array name="list_preference_units_values">
+        <item>metric</item>
+        <item>imperial</item>
+        <item> </item>
+    </string-array>
+
+    <string name="pref_default_display_unit_value">metric</string>
 
     <string-array name="pref_weather_cities">
         <item name="pref_weather_city1">Lodz, PL</item>

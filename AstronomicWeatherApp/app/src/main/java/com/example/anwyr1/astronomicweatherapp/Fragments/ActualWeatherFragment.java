@@ -35,8 +35,9 @@ public class ActualWeatherFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String firstUrlWeatherApiPart = "http://api.openweathermap.org/data/2.5/weather?q=";
-    private static final String secondUrlWeatherApiPart = "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562";
+    private static final String secondUrlWeatherApiPart = "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=";
     private static String currentCity;
+    private static String units;
     private static CurrentWeather currentWeather;
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -87,11 +88,14 @@ public class ActualWeatherFragment extends Fragment {
         currentCity = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_city_key),
                 getResources().getString(R.string.pref_weather_cities_default_city), getContext());
         currentCity = currentCity.replaceAll("\\s","");
+        units = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_units_key),
+                getResources().getString(R.string.pref_default_display_unit_value), getContext());
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    loadXmlFromNetwork(firstUrlWeatherApiPart + currentCity + secondUrlWeatherApiPart);
+                    loadXmlFromNetwork(firstUrlWeatherApiPart + currentCity +
+                            secondUrlWeatherApiPart + units);
                 } catch (XmlPullParserException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
