@@ -32,16 +32,11 @@ import java.net.URL;
  * create an instance of this fragment.
  */
 public class ActualWeatherFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String firstUrlWeatherApiPart = "http://api.openweathermap.org/data/2.5/weather?q=";
     private static final String secondUrlWeatherApiPart = "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=";
     private static String currentCity;
     private static String units;
     private static CurrentWeather currentWeather;
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
@@ -57,12 +52,9 @@ public class ActualWeatherFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment ActualWeatherFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static ActualWeatherFragment newInstance(String param1, String param2) {
         ActualWeatherFragment fragment = new ActualWeatherFragment();
         Bundle args = new Bundle();
-        args.putString(firstUrlWeatherApiPart, param1);
-        args.putString(secondUrlWeatherApiPart, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -70,10 +62,6 @@ public class ActualWeatherFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(firstUrlWeatherApiPart);
-            mParam2 = getArguments().getString(secondUrlWeatherApiPart);
-        }
     }
 
     @Override
@@ -184,7 +172,6 @@ public class ActualWeatherFragment extends Fragment {
         return conn.getInputStream();
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -219,7 +206,6 @@ public class ActualWeatherFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 }

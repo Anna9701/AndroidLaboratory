@@ -83,6 +83,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return true;
         }
 
+        //TODO check if entered city is valid
         private void updateProperFavoriteCity(Preference preference, String stringValue) {
             String key = preference.getKey();
             switch (key) {

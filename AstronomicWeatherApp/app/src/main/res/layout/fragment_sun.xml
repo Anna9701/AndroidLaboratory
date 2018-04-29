@@ -4,8 +4,6 @@
     android:layout_height="match_parent"
     tools:context="com.example.anwyr1.astronomicweatherapp.Fragments.SunFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <TableLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

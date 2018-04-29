@@ -51,12 +51,9 @@ public class ForecastFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment ForecastFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static ForecastFragment newInstance(String param1, String param2) {
         ForecastFragment fragment = new ForecastFragment();
         Bundle args = new Bundle();
-        args.putString(firstUrlWeatherApiPart, param1);
-        args.putString(secondUrlWeatherApiPart, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -64,11 +61,6 @@ public class ForecastFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            String mParam1 = getArguments().getString(firstUrlWeatherApiPart);
-            String mParam2 = getArguments().getString(secondUrlWeatherApiPart);
-        }
-
     }
 
     @Override
@@ -176,7 +168,6 @@ public class ForecastFragment extends Fragment {
         return conn.getInputStream();
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -211,7 +202,6 @@ public class ForecastFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 }
