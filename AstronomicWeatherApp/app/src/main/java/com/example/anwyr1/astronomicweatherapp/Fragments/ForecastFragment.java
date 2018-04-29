@@ -1,4 +1,4 @@
-package com.example.anwyr1.astronomicweatherapp;
+package com.example.anwyr1.astronomicweatherapp.Fragments;
 
 import android.content.Context;
 import android.net.Uri;
@@ -8,16 +8,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.anwyr1.astronomicweatherapp.R;
+
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ActualWeatherFragment.OnFragmentInteractionListener} interface
+ * {@link ForecastFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link ActualWeatherFragment#newInstance} factory method to
+ * Use the {@link ForecastFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ActualWeatherFragment extends Fragment {
+public class ForecastFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -29,7 +31,7 @@ public class ActualWeatherFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public ActualWeatherFragment() {
+    public ForecastFragment() {
         // Required empty public constructor
     }
 
@@ -39,11 +41,11 @@ public class ActualWeatherFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment ActualWeatherFragment.
+     * @return A new instance of fragment ForecastFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ActualWeatherFragment newInstance(String param1, String param2) {
-        ActualWeatherFragment fragment = new ActualWeatherFragment();
+    public static ForecastFragment newInstance(String param1, String param2) {
+        ForecastFragment fragment = new ForecastFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -58,13 +60,19 @@ public class ActualWeatherFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_actual_weather, container, false);
+        return inflater.inflate(R.layout.fragment_forecast, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event

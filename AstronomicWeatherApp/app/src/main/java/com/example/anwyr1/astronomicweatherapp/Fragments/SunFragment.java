@@ -1,6 +1,5 @@
-package com.example.anwyr1.astronomicweatherapp;
+package com.example.anwyr1.astronomicweatherapp.Fragments;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,19 +10,23 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.astrocalculator.AstroCalculator;
+import com.example.anwyr1.astronomicweatherapp.AstronomicCalculator;
+import com.example.anwyr1.astronomicweatherapp.R;
+import com.example.anwyr1.astronomicweatherapp.SettingsActivity;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MoonFragment.OnFragmentInteractionListener} interface
+ * {@link SunFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MoonFragment#newInstance} factory method to
+ * Use the {@link SunFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MoonFragment extends Fragment {
+public class SunFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -36,7 +39,7 @@ public class MoonFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public MoonFragment() {
+    public SunFragment() {
         // Required empty public constructor
     }
 
@@ -46,11 +49,11 @@ public class MoonFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment MoonFragment.
+     * @return A new instance of fragment SunFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MoonFragment newInstance(String param1, String param2) {
-        MoonFragment fragment = new MoonFragment();
+    public static SunFragment newInstance(String param1, String param2) {
+        SunFragment fragment = new SunFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -71,29 +74,7 @@ public class MoonFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
-        return inflater.inflate(R.layout.fragment_moon, container, true);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        String syncTimeString = SettingsActivity.getFromSettings("sync_frequency",
-                getString(R.string.pref_default_display_sync_time_value), getContext());
-        int time = Integer.parseInt(syncTimeString);
-        time *= MillisecondsInSecond;
-        timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                getActivity().runOnUiThread(new TimerTask() {
-                    @Override
-                    public void run() {
-                        AstronomicCalculator.getInstance(getContext()).updateAstroCalendar(getContext());
-                        loadMoonRelatedData();
-                    }
-                });
-            }
-        }, 0, time);
+        return inflater.inflate(R.layout.fragment_sun, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -112,12 +93,12 @@ public class MoonFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        timer.cancel();
         mListener = null;
     }
 
@@ -127,40 +108,45 @@ public class MoonFragment extends Fragment {
         super.onDestroy();
     }
 
-    private void loadMoonRelatedData() {
-        AstronomicCalculator astronomicCalculator = AstronomicCalculator.getInstance(getContext());
-        AstroCalculator.MoonInfo moonInfo = astronomicCalculator.getAstroCalculator().getMoonInfo();
-        final TextView moonriseDate = getView().findViewById(R.id.moonRise);
-        final TextView moonSetDate = getView().findViewById(R.id.moonSet);
-        final TextView nextNewMoon = getView().findViewById(R.id.nextNewMoon);
-        final TextView nextFullMoon = getView().findViewById(R.id.nextFullMoon);
-        final TextView illumination = getView().findViewById(R.id.illumination);
-        final TextView monthAge = getView().findViewById(R.id.monthAge);
-        try {
-            moonriseDate.setText(moonInfo.getMoonrise().toString());
-            moonSetDate.setText(moonInfo.getMoonset().toString());
-            nextNewMoon.setText(moonInfo.getNextNewMoon().toString());
-            nextFullMoon.setText(moonInfo.getNextFullMoon().toString());
-            illumination.setText(String.valueOf(moonInfo.getIllumination()));
-            monthAge.setText(String.valueOf(moonInfo.getAge()));
-        } catch (NullPointerException ex) {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setTitle("Sync error");
-            builder.setMessage("Something's gone wrong... Restoring default longitude and latitude " +
-                    "values");
-            builder.setPositiveButton(android.R.string.ok, null);
-            builder.show();
-            restoreDefaultLatitudeAndLongitude();
-        }
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        String syncTimeString = SettingsActivity.getFromSettings("sync_frequency",
+                getString(R.string.pref_default_display_sync_time_value), getContext());
+        int time = Integer.parseInt(syncTimeString);
+        time *= MillisecondsInSecond;
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (getActivity() != null) {
+                getActivity().runOnUiThread(new TimerTask() {
+                    @Override
+                    public void run() {
+                        AstronomicCalculator.getInstance(getContext()).updateAstroCalendar(getContext());
+                        loadSunRelatedData();
+                    }
+                });}
+            }
+        }, 0, time);
     }
 
-    private void restoreDefaultLatitudeAndLongitude() {
-        SettingsActivity.setSettings("latitude",
-                getString(R.string.pref_default_display_latitude), getContext());
-        SettingsActivity.setSettings("longitude",
-                getString(R.string.pref_default_display_longitude), getContext());
-        loadMoonRelatedData();
+    private void loadSunRelatedData() {
+        AstronomicCalculator astronomicCalculator = AstronomicCalculator.getInstance(getContext());
+        AstroCalculator.SunInfo sunInfo = astronomicCalculator.getAstroCalculator().getSunInfo();
+        final TextView sunriseDate = getView().findViewById(R.id.sunriseTime);
+        final TextView sunriseAzimuth = getView().findViewById(R.id.sunriseAzimuth);
+        final TextView sunsetDate = getView().findViewById(R.id.sunsetTime);
+        final TextView sunsetAzimuth = getView().findViewById(R.id.sunsetAzimuth);
+        final TextView civilSunrise = getView().findViewById(R.id.civilSunrise);
+        final TextView civilSunset = getView().findViewById(R.id.civilSunset);
+        sunriseDate.setText(sunInfo.getSunrise().toString());
+        sunriseAzimuth.setText(String.valueOf(sunInfo.getAzimuthRise()));
+        sunsetDate.setText(sunInfo.getSunset().toString());
+        sunsetAzimuth.setText(String.valueOf(sunInfo.getAzimuthSet()));
+        civilSunrise.setText(sunInfo.getTwilightMorning().toString());
+        civilSunset.setText(sunInfo.getTwilightEvening().toString());
     }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

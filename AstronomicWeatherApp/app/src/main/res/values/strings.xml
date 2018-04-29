@@ -58,6 +58,7 @@
     <string-array name="list_preference_units">
         <item>Celsius</item>
         <item>Fahrenheits</item>
+        <item>Kelvin</item>
     </string-array>
 
     <string name="pref_default_display_unit_value">Celsius</string>

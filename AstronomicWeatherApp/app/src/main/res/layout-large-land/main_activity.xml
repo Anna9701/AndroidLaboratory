@@ -33,7 +33,7 @@
 
         <fragment
             android:id="@+id/fragment"
-            android:name="com.example.anwyr1.astronomicweatherapp.SunFragment"
+            android:name="com.example.anwyr1.astronomicweatherapp.Fragments.SunFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
@@ -47,7 +47,7 @@
 
         <fragment
             android:id="@+id/fragment2"
-            android:name="com.example.anwyr1.astronomicweatherapp.MoonFragment"
+            android:name="com.example.anwyr1.astronomicweatherapp.Fragments.MoonFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
