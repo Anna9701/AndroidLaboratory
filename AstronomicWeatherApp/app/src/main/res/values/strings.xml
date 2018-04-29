@@ -118,4 +118,8 @@
     <string name="additional_city_def_value" />
     <string name="pref_weather_cities_title">Favorite city</string>
     <string name="list_cities_category">List favorites cities:</string>
+    <string name="weather_units_key">weather_units</string>
+    <string name="sync_frequency_key">sync_frequency</string>
+    <string name="latitude_key">latitude</string>
+    <string name="longitude_key">longitude</string>
 </resources>

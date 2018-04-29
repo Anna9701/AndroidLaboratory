@@ -125,9 +125,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     };
 
-
-
-
     /**
      * Helper method to determine if the device has an extra-large screen. For
      * example, 10" tablets are extra-large.
@@ -162,11 +159,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
-        city1 = getFromSettings("city1_value", getResources().getString(R.string.pref_weather_cities_default_city), this);
-        city2 = getFromSettings("city2_value", "", this);
-        city3 = getFromSettings("city3_value", "", this);
-        city4 = getFromSettings("city4_value", "", this);
-        city5 = getFromSettings("city5_value", "", this);
+        city1 = getFromSettings(getResources().getString(R.string.city1_key),
+                getResources().getString(R.string.pref_weather_cities_default_city), this);
+        city2 = getFromSettings(getResources().getString(R.string.city2_key),
+                getResources().getString(R.string.additional_city_def_value), this);
+        city3 = getFromSettings(getResources().getString(R.string.city3_key),
+                getResources().getString(R.string.additional_city_def_value), this);
+        city4 = getFromSettings(getResources().getString(R.string.city4_key),
+                getResources().getString(R.string.additional_city_def_value), this);
+        city5 = getFromSettings(getResources().getString(R.string.city5_key),
+                getResources().getString(R.string.additional_city_def_value), this);
     }
 
     /**
@@ -255,8 +257,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // ues. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("latitude"));
-            bindPreferenceSummaryToValue(findPreference("longitude"));
+            bindPreferenceSummaryToValue(findPreference(getResources().getString(R.string.latitude_key)));
+            bindPreferenceSummaryToValue(findPreference(getResources().getString(R.string.longitude_key)));
         }
 
         @Override
@@ -277,20 +279,19 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class NotificationPreferenceFragment extends PreferenceFragment {
         private static ListPreference listPreference;
-        private static final int CITIES_AMOUNT = 5;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_weather);
             setHasOptionsMenu(true);
-            listPreference = (ListPreference) findPreference("selected_city");
-            bindPreferenceSummaryToValue(findPreference("weather_units"));
-            bindPreferenceSummaryToValue(findPreference("city1_value"));
-            bindPreferenceSummaryToValue(findPreference("city2_value"));
-            bindPreferenceSummaryToValue(findPreference("city3_value"));
-            bindPreferenceSummaryToValue(findPreference("city4_value"));
-            bindPreferenceSummaryToValue(findPreference("city5_value"));
+            listPreference = (ListPreference) findPreference(getResources().getString(R.string.weather_city_key));
+            bindPreferenceSummaryToValue(findPreference(getResources().getString(R.string.weather_units_key)));
+            bindPreferenceSummaryToValue(findPreference(getResources().getString(R.string.city1_key)));
+            bindPreferenceSummaryToValue(findPreference(getResources().getString(R.string.city2_key)));
+            bindPreferenceSummaryToValue(findPreference(getResources().getString(R.string.city3_key)));
+            bindPreferenceSummaryToValue(findPreference(getResources().getString(R.string.city4_key)));
+            bindPreferenceSummaryToValue(findPreference(getResources().getString(R.string.city5_key)));
             bindPreferenceSummaryToValue(loadCitiesListEntries());
         }
 
@@ -336,7 +337,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("sync_frequency"));
+            bindPreferenceSummaryToValue(findPreference(getResources().getString(R.string.sync_frequency_key)));
         }
 
         @Override
