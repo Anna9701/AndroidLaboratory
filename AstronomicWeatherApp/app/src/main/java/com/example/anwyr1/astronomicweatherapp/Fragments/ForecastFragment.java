@@ -8,7 +8,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.anwyr1.astronomicweatherapp.Forecast.ForecastData;
 import com.example.anwyr1.astronomicweatherapp.R;
+import com.example.anwyr1.astronomicweatherapp.SettingsActivity;
+import com.example.anwyr1.astronomicweatherapp.XmlUtils.ForecastXmlParser;
+import com.example.anwyr1.astronomicweatherapp.XmlUtils.ObjectSerializerHelper;
+
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 
 /**
@@ -20,14 +31,10 @@ import com.example.anwyr1.astronomicweatherapp.R;
  * create an instance of this fragment.
  */
 public class ForecastFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private static final String firstUrlWeatherApiPart = "http://api.openweathermap.org/data/2.5/forecast?q=";
+    private static final String secondUrlWeatherApiPart = "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562";
+    private static String currentCity;
+    private static ForecastData forecastData;
 
     private OnFragmentInteractionListener mListener;
 
@@ -47,8 +54,8 @@ public class ForecastFragment extends Fragment {
     public static ForecastFragment newInstance(String param1, String param2) {
         ForecastFragment fragment = new ForecastFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(firstUrlWeatherApiPart, param1);
+        args.putString(secondUrlWeatherApiPart, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -57,8 +64,8 @@ public class ForecastFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            String mParam1 = getArguments().getString(firstUrlWeatherApiPart);
+            String mParam2 = getArguments().getString(secondUrlWeatherApiPart);
         }
 
     }
@@ -72,7 +79,55 @@ public class ForecastFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        currentCity = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_city_key),
+                getResources().getString(R.string.pref_weather_cities_default_city), getContext());
+        currentCity = currentCity.replaceAll("\\s","");
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    loadXmlFromNetwork(firstUrlWeatherApiPart + currentCity + secondUrlWeatherApiPart);
+                } catch (XmlPullParserException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+    }
 
+    private void loadXmlFromNetwork(String urlString) throws XmlPullParserException, IOException {
+        InputStream stream = null;
+        // Instantiate the parser
+        ForecastXmlParser forecastXmlParser = new ForecastXmlParser();
+        try {
+            stream = downloadUrl(urlString);
+            forecastData = forecastXmlParser.parse(stream);
+            String forecastToSave = ObjectSerializerHelper.objectToString(forecastData);
+            SettingsActivity.setSettings("forecastDataSaved", forecastToSave, getContext());
+        } catch (Exception ex) {
+            String savedForecastData = SettingsActivity.getFromSettings("forecastDataSaved",
+                    "No forecast data was saved. Please, refresh app when you have " +
+                            "internet access", getContext());
+            forecastData = (ForecastData) ObjectSerializerHelper.stringToObject(savedForecastData);
+        } finally {
+            if (stream != null) {
+                stream.close();
+            }
+        }
+    }
+
+    private InputStream downloadUrl(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setReadTimeout(10000 /* milliseconds */);
+        conn.setConnectTimeout(15000 /* milliseconds */);
+        conn.setRequestMethod("GET");
+        conn.setDoInput(true);
+        // Starts the query
+        conn.connect();
+        return conn.getInputStream();
     }
 
     // TODO: Rename method, update argument and hook method into UI event
