@@ -122,4 +122,6 @@
     <string name="sync_frequency_key">sync_frequency</string>
     <string name="latitude_key">latitude</string>
     <string name="longitude_key">longitude</string>
+    <string name="app_author">Anna Wyrwał</string>
+    <string name="app_author_email">wyrwalanna13@gmail.com</string>
 </resources>
