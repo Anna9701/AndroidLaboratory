@@ -126,4 +126,5 @@
     <string name="longitude_key">longitude</string>
     <string name="app_author">Anna Wyrwał</string>
     <string name="app_author_email">wyrwalanna13@gmail.com</string>
+    <string name="refresh_weather_setting">Refresh weather data</string>
 </resources>

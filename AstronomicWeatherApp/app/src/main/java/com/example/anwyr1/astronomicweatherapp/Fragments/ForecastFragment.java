@@ -33,10 +33,10 @@ import java.net.URL;
  */
 public class ForecastFragment extends Fragment {
     private static final String firstUrlWeatherApiPart = "http://api.openweathermap.org/data/2.5/forecast?q=";
-    private static final String secondUrlWeatherApiPart = "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562";
+    private static final String secondUrlWeatherApiPart = "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=";
     private static String currentCity;
     private static ForecastData forecastData;
-
+    private static String units;
     private OnFragmentInteractionListener mListener;
 
     public ForecastFragment() {
@@ -83,11 +83,13 @@ public class ForecastFragment extends Fragment {
         currentCity = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_city_key),
                 getResources().getString(R.string.pref_weather_cities_default_city), getContext());
         currentCity = currentCity.replaceAll("\\s","");
+        units = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_units_key),
+                getResources().getString(R.string.pref_default_display_unit_value), getContext());
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    loadXmlFromNetwork(firstUrlWeatherApiPart + currentCity + secondUrlWeatherApiPart);
+                    loadXmlFromNetwork(firstUrlWeatherApiPart + currentCity + secondUrlWeatherApiPart + units);
                 } catch (XmlPullParserException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -144,6 +146,17 @@ public class ForecastFragment extends Fragment {
 
             }
         });
+    }
+
+    public void refreshCurrentWeather() {
+        try {
+            loadXmlFromNetwork(firstUrlWeatherApiPart + currentCity +
+                    secondUrlWeatherApiPart + units);
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void printNonActualForecastAlert() {

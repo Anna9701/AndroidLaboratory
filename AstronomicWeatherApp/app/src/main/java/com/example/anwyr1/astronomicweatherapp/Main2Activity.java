@@ -99,8 +99,21 @@ public class Main2Activity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
+        } else if (id == R.id.action_updateWeatherData) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try  {
+                        ActualWeatherFragment actualWeatherFragment = ((ActualWeatherFragment) getSupportFragmentManager().findFragmentById(R.id.fragment4b));
+                        actualWeatherFragment.refreshCurrentWeather();
+                        ForecastFragment forecastFragment = ((ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment3b));
+                        forecastFragment.refreshCurrentWeather();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
         }
-
         return super.onOptionsItemSelected(item);
     }
 

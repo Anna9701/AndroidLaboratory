@@ -106,6 +106,17 @@ public class ActualWeatherFragment extends Fragment {
         thread.start();
     }
 
+    public void refreshCurrentWeather() {
+        try {
+            loadXmlFromNetwork(firstUrlWeatherApiPart + currentCity +
+                    secondUrlWeatherApiPart + units);
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void loadXmlFromNetwork(String urlString) throws XmlPullParserException, IOException {
         InputStream stream = null;
         // Instantiate the parser
