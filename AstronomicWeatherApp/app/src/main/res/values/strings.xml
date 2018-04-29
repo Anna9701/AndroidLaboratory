@@ -62,6 +62,16 @@
 
     <string name="pref_default_display_unit_value">Celsius</string>
 
+    <string-array name="pref_weather_cities">
+        <item name="pref_weather_city1">Lodz, PL</item>
+        <item name="pref_weather_city2"> </item>
+        <item name="pref_weather_city3"> </item>
+        <item name="pref_weather_city4"> </item>
+        <item name="pref_weather_city5"> </item>
+    </string-array>
+
+    <string name="pref_weather_cities_default_city">Lodz, PL</string>
+
     <string-array name="multi_select_list_preference_default_value" />
 
     <string name="pref_title_system_sync_settings">System sync settings</string>
@@ -97,4 +107,15 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="pref_header_weather">Weather settings</string>
     <string name="wether_unit_name">Unit</string>
+    <string name="pref_weather_cities_list_header">Cities list</string>
+    <string name="weather_city_key">selected_city</string>
+    <string name="City_selected_name">Select city to display weather to</string>
+    <string name="city1_key">city1_value</string>
+    <string name="city2_key">city2_value</string>
+    <string name="city3_key">city3_value</string>
+    <string name="city4_key">city4_value</string>
+    <string name="city5_key">city5_value</string>
+    <string name="additional_city_def_value" />
+    <string name="pref_weather_cities_title">Favorite city</string>
+    <string name="list_cities_category">List favorites cities:</string>
 </resources>

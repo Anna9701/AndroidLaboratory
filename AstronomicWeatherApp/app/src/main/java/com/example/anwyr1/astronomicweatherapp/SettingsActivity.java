@@ -6,9 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
@@ -18,13 +15,12 @@ import android.preference.PreferenceActivity;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
-import android.text.TextUtils;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,6 +35,8 @@ import java.util.List;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
+    private static String city1, city2, city3, city4, city5;
+
     public static String getFromSettings(String key, String defValue,  Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         return preferences.getString(key, defValue);
@@ -70,39 +68,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         index >= 0
                                 ? listPreference.getEntries()[index]
                                 : null);
-
-            } else if (preference instanceof RingtonePreference) {
-                // For ringtone preferences, look up the correct display value
-                // using RingtoneManager.
-                if (TextUtils.isEmpty(stringValue)) {
-                    // Empty values correspond to 'silent' (no ringtone).
-                    preference.setSummary(R.string.pref_ringtone_silent);
-
-                } else {
-                    Ringtone ringtone = RingtoneManager.getRingtone(
-                            preference.getContext(), Uri.parse(stringValue));
-
-                    if (ringtone == null) {
-                        // Clear the summary if there was a lookup error.
-                        preference.setSummary(null);
-                    } else {
-                        // Set the summary to reflect the new ringtone display
-                        // name.
-                        String name = ringtone.getTitle(preference.getContext());
-                        preference.setSummary(name);
-                    }
-                }
-            } else if (preference instanceof EditTextPreference) {
-                if (!NumberUtils.isParsable(stringValue)
-                        || Double.parseDouble(stringValue) <= -90
-                        || Double.parseDouble(stringValue) >= 90) {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(preference.getContext());
-                    builder.setTitle("Invalid Input");
-                    builder.setMessage("Something's gone wrong...");
-                    builder.setPositiveButton(android.R.string.ok, null);
-                    builder.show();
+            } else if (preference instanceof EditTextPreference && (preference.getKey().equals("latitude")
+                    || preference.getKey().equals("longitude"))) {
+                if (!updateLatitudeOrLongitude(preference, stringValue))
                     return false;
-                }
+            } else if (preference instanceof EditTextPreference) {
+                updateProperFavoriteCity(preference, stringValue);
                 preference.setSummary(stringValue);
             } else {
                 // For all other preferences, set the summary to the value's
@@ -111,7 +82,51 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
             return true;
         }
+
+        private void updateProperFavoriteCity(Preference preference, String stringValue) {
+            String key = preference.getKey();
+            switch (key) {
+                case "city1_value":
+                    city1 = stringValue;
+                    break;
+                case "city2_value":
+                    city2 = stringValue;
+                    break;
+                case "city3_value":
+                    city3 = stringValue;
+                    break;
+                case "city4_value":
+                    city4 = stringValue;
+                    break;
+                case "city5_value":
+                    city5 = stringValue;
+                    break;
+                default:
+                    return;
+            }
+            NotificationPreferenceFragment.loadCitiesListEntries();
+        }
+
+        private boolean updateLatitudeOrLongitude(Preference preference, String stringValue) {
+            if (!NumberUtils.isParsable(stringValue)
+                    || Double.parseDouble(stringValue) <= -90
+                    || Double.parseDouble(stringValue) >= 90) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(preference.getContext());
+                builder.setTitle("Invalid Input");
+                builder.setMessage("Something's gone wrong...");
+                builder.setPositiveButton(android.R.string.ok, null);
+                builder.show();
+                return false;
+            }
+            preference.setSummary(stringValue);
+            return true;
+        }
+
+
     };
+
+
+
 
     /**
      * Helper method to determine if the device has an extra-large screen. For
@@ -147,6 +162,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
+        city1 = getFromSettings("city1_value", getResources().getString(R.string.pref_weather_cities_default_city), this);
+        city2 = getFromSettings("city2_value", "", this);
+        city3 = getFromSettings("city3_value", "", this);
+        city4 = getFromSettings("city4_value", "", this);
+        city5 = getFromSettings("city5_value", "", this);
     }
 
     /**
@@ -256,17 +276,37 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class NotificationPreferenceFragment extends PreferenceFragment {
+        private static ListPreference listPreference;
+        private static final int CITIES_AMOUNT = 5;
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_weather);
             setHasOptionsMenu(true);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
+            listPreference = (ListPreference) findPreference("selected_city");
             bindPreferenceSummaryToValue(findPreference("weather_units"));
+            bindPreferenceSummaryToValue(findPreference("city1_value"));
+            bindPreferenceSummaryToValue(findPreference("city2_value"));
+            bindPreferenceSummaryToValue(findPreference("city3_value"));
+            bindPreferenceSummaryToValue(findPreference("city4_value"));
+            bindPreferenceSummaryToValue(findPreference("city5_value"));
+            bindPreferenceSummaryToValue(loadCitiesListEntries());
+        }
+
+        public static Preference loadCitiesListEntries () {
+            if (listPreference == null)
+                return listPreference;
+            String[] cities = new String[] {city1, city2, city3, city4, city5};
+            ArrayList<String> entries = new ArrayList<>();
+            for (String city : cities) {
+                if (city.length() > 0) {
+                    entries.add(city);
+                }
+            }
+            listPreference.setEntries(entries.toArray(new String[0]));
+            listPreference.setEntryValues(entries.toArray(new String[0]));
+            return listPreference;
         }
 
         @Override
