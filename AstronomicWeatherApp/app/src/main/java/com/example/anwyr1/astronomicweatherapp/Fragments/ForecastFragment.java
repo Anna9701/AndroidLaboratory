@@ -1,5 +1,6 @@
 package com.example.anwyr1.astronomicweatherapp.Fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -108,14 +109,46 @@ public class ForecastFragment extends Fragment {
             SettingsActivity.setSettings("forecastDataSaved", forecastToSave, getContext());
         } catch (Exception ex) {
             String savedForecastData = SettingsActivity.getFromSettings("forecastDataSaved",
-                    "No forecast data was saved. Please, refresh app when you have " +
-                            "internet access", getContext());
-            forecastData = (ForecastData) ObjectSerializerHelper.stringToObject(savedForecastData);
+                    null, getContext());
+            if (savedForecastData != null) {
+                forecastData = (ForecastData) ObjectSerializerHelper.stringToObject(savedForecastData);
+                printNonActualForecastAlert();
+            } else {
+                printNoForecastAvailableAlert();
+            }
         } finally {
             if (stream != null) {
                 stream.close();
             }
         }
+    }
+
+    private void printNoForecastAvailableAlert() {
+        printNoInternetAccessAlert("There is no connection to internet available. " +
+                "We have no any forecast saved. Please, connect to internet to get forecast data.");
+    }
+
+    private void printNoInternetAccessAlert(final String alertMessage) {
+        getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("No internet connection available");
+                builder.setMessage(alertMessage);
+                builder.setPositiveButton(android.R.string.ok, null);
+                AlertDialog alertDialog = builder.create();
+                try {
+                    alertDialog.show();
+                } catch (Exception e) {
+                    alertDialog.dismiss();
+                }
+
+            }
+        });
+    }
+
+    private void printNonActualForecastAlert() {
+        printNoInternetAccessAlert("There is no connection to internet available. " +
+                "Presented forecast can be non actual. To update data, please, connect to internet.");
     }
 
     private InputStream downloadUrl(String urlString) throws IOException {

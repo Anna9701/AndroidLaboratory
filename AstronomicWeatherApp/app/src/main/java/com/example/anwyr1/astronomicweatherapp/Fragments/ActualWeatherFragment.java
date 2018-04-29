@@ -1,5 +1,6 @@
 package com.example.anwyr1.astronomicweatherapp.Fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -112,14 +113,48 @@ public class ActualWeatherFragment extends Fragment {
             SettingsActivity.setSettings("actualWeatherSaved", weatherToSave, getContext());
         } catch (Exception ex) {
             String savedCurrentWeather = SettingsActivity.getFromSettings("actualWeatherSaved",
-                    "No current weather was saved. Please, refresh app when you have " +
-                            "internet access", getContext());
-            currentWeather = (CurrentWeather) ObjectSerializerHelper.stringToObject(savedCurrentWeather);
+                    null , getContext());
+            if (savedCurrentWeather != null) {
+                currentWeather = (CurrentWeather) ObjectSerializerHelper.stringToObject(savedCurrentWeather);
+                printNonActualCurrentWeatherAlert();
+            } else {
+                printNoCurrentWeatherAvailableAlert();
+            }
         } finally {
             if (stream != null) {
                 stream.close();
             }
         }
+    }
+
+    private void printNoCurrentWeatherAvailableAlert() {
+        printNoInternetAccessAlert("There is no connection to internet available. " +
+                "We have no any current weather data saved. Please, connect to internet to get " +
+                "current weather data.");
+    }
+
+    private void printNoInternetAccessAlert(final String alertMessage) {
+        getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("No internet connection available");
+                builder.setMessage(alertMessage);
+                builder.setPositiveButton(android.R.string.ok, null);
+                AlertDialog alertDialog = builder.create();
+                try {
+                    alertDialog.show();
+                } catch (Exception e) {
+                    alertDialog.dismiss();
+                }
+
+            }
+        });
+    }
+
+    private void printNonActualCurrentWeatherAlert() {
+        printNoInternetAccessAlert("There is no connection to internet available. " +
+                "Presented current weather data can be non actual. To update data, please, " +
+                "connect to internet.");
     }
 
     private InputStream downloadUrl(String urlString) throws IOException {
