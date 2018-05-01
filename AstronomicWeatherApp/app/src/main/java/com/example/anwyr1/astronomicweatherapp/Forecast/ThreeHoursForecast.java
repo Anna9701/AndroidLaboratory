@@ -1,6 +1,7 @@
 package com.example.anwyr1.astronomicweatherapp.Forecast;
 
 import com.example.anwyr1.astronomicweatherapp.Forecast.ForecastUtils.Clouds;
+import com.example.anwyr1.astronomicweatherapp.Forecast.ForecastUtils.Precipitation;
 import com.example.anwyr1.astronomicweatherapp.Forecast.ForecastUtils.Time;
 import com.example.anwyr1.astronomicweatherapp.Forecast.ForecastUtils.Wind;
 import com.example.anwyr1.astronomicweatherapp.Weather.CurrentWeatherUtil.Humidity;
@@ -20,14 +21,18 @@ public class ThreeHoursForecast implements Serializable{
     private Pressure pressure;
     private Humidity humidity;
     private Clouds clouds;
+    private Precipitation precipitation;
+    private String weatherCondition;
 
-    public ThreeHoursForecast(Time time, Wind wind, Temperature temperature, Pressure pressure, Humidity humidity, Clouds clouds) {
+    public ThreeHoursForecast(Time time, Wind wind, Temperature temperature, Pressure pressure, Humidity humidity, Clouds clouds, Precipitation precipitation, String weatherCondition) {
         this.time = time;
         this.wind = wind;
         this.temperature = temperature;
         this.pressure = pressure;
         this.humidity = humidity;
         this.clouds = clouds;
+        this.precipitation = precipitation;
+        this.weatherCondition = weatherCondition;
     }
 
     public Time getTime() {
@@ -76,5 +81,21 @@ public class ThreeHoursForecast implements Serializable{
 
     public void setClouds(Clouds clouds) {
         this.clouds = clouds;
+    }
+
+    public Precipitation getPrecipitation() {
+        return precipitation;
+    }
+
+    public void setPrecipitation(Precipitation precipitation) {
+        this.precipitation = precipitation;
+    }
+
+    public String getWeatherCondition() {
+        return weatherCondition;
+    }
+
+    public void setWeatherCondition(String weatherCondition) {
+        this.weatherCondition = weatherCondition;
     }
 }

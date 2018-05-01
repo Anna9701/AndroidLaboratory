@@ -43,7 +43,7 @@
                 android:id="@+id/fragment4b"
                 android:name="com.example.anwyr1.astronomicweatherapp.Fragments.ActualWeatherFragment"
                 layout="@layout/fragment_actual_weather"
-                android:layout_width="338dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:layout_marginEnd="8dp"
@@ -63,7 +63,7 @@
             <fragment
                 android:id="@+id/fragment3b"
                 android:name="com.example.anwyr1.astronomicweatherapp.Fragments.ForecastFragment"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:layout_marginEnd="8dp"

@@ -144,6 +144,7 @@ public class ForecastFragment extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     private void printNonActualForecastAlert() {
