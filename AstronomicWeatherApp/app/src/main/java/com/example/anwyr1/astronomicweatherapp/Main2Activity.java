@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -13,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.example.anwyr1.astronomicweatherapp.Fragments.ActualWeatherFragment;
@@ -34,6 +34,9 @@ public class Main2Activity extends AppCompatActivity
 
     private static ActualWeatherFragment actualWeatherFragment;
     private static ForecastFragment forecastFragment;
+    private final static String calendarMode = "calendar";
+    private final static String weatherMode = "weather";
+    private static String mode = calendarMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +56,8 @@ public class Main2Activity extends AppCompatActivity
         setupCurrentTimeAndLocalization();
         actualWeatherFragment = ((ActualWeatherFragment) getSupportFragmentManager().findFragmentById(R.id.fragment4b));
         forecastFragment = ((ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment3b));
+        if (mode.equals(weatherMode))
+            setWeatherMode();
     }
 
     private void setupCurrentTimeAndLocalization() {
@@ -130,15 +135,25 @@ public class Main2Activity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_weather) {
-            findViewById(R.id.main_activity).setVisibility(View.GONE);
-            findViewById(R.id.weather_activity).setVisibility(View.VISIBLE);
+            mode = weatherMode;
+            setWeatherMode();
         } else if (id == R.id.nav_calendar) {
-            findViewById(R.id.main_activity).setVisibility(View.VISIBLE);
-            findViewById(R.id.weather_activity).setVisibility(View.GONE);
+            mode = calendarMode;
+            setCalendarMode();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void setWeatherMode() {
+        findViewById(R.id.main_activity).setVisibility(View.GONE);
+        findViewById(R.id.weather_activity).setVisibility(View.VISIBLE);
+    }
+
+    private void setCalendarMode() {
+        findViewById(R.id.main_activity).setVisibility(View.VISIBLE);
+        findViewById(R.id.weather_activity).setVisibility(View.GONE);
     }
 
     @Override

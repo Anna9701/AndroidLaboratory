@@ -23,7 +23,8 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,15 +34,24 @@ import java.net.URL;
  * Use the {@link ActualWeatherFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-//TODO display weather info
+//TODO check and set correctly display on tablets
 public class ActualWeatherFragment extends Fragment {
-    private static final String firstUrlWeatherApiPart = "http://api.openweathermap.org/data/2.5/weather?q=";
-    private static final String secondUrlWeatherApiPart = "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=";
-    private static String currentCity;
-    private static String units;
     private static CurrentWeather currentWeather;
-
     private OnFragmentInteractionListener mListener;
+    @BindView(R.id.current_weather_place_name)TextView placeTextView;
+    @BindView(R.id.current_weather_sunrise)TextView sunriseTextView;
+    @BindView(R.id.current_weather_sunset)TextView sunsetTextView;
+    @BindView(R.id.current_weather_temp_value)TextView currentTempTextView;
+    @BindView(R.id.current_weather_temp_max)TextView maxTempTextView;
+    @BindView(R.id.current_weather_temp_min)TextView minTempTextView;
+    @BindView(R.id.current_weather_temp_unit_name)TextView tempUnitTextView;
+    @BindView(R.id.currentWeather_humidity_value)TextView humidityTextView;
+    @BindView(R.id.currentWeather_pressure_value)TextView pressureTextView;
+    @BindView(R.id.currentWeather_clouds_value)TextView cloudsTextView;
+    @BindView(R.id.currentWeather_precipitation_mode)TextView precipitationTextView;
+    @BindView(R.id.currentWeather_wind_name)TextView windNameTextView;
+    @BindView(R.id.currentWeather_wind_direction)TextView windDirectionTextView;
+    @BindView(R.id.currentWeather_wind_speed)TextView windSpeedTextView;
 
     public ActualWeatherFragment() {
         // Required empty public constructor
@@ -70,8 +80,9 @@ public class ActualWeatherFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_actual_weather, container, false);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_actual_weather, container, false);
+        ButterKnife.bind(this, rootView);
+        return rootView;
     }
 
     @Override
@@ -90,20 +101,6 @@ public class ActualWeatherFragment extends Fragment {
     }
 
     private void setCurrentWeatherView() {
-        TextView placeTextView = getView().findViewById(R.id.current_weather_place_name);
-        TextView sunriseTextView = getView().findViewById(R.id.current_weather_sunrise);
-        TextView sunsetTextView = getView().findViewById(R.id.current_weather_sunset);
-        TextView currentTempTextView = getView().findViewById(R.id.current_weather_temp_value);
-        TextView maxTempTextView = getView().findViewById(R.id.current_weather_temp_max);
-        TextView minTempTextView = getView().findViewById(R.id.current_weather_temp_min);
-        TextView tempUnitTextView = getView().findViewById(R.id.current_weather_temp_unit_name);
-        TextView humidityTextView = getView().findViewById(R.id.currentWeather_humidity_value);
-        TextView pressureTextView = getView().findViewById(R.id.currentWeather_pressure_value);
-        TextView cloudsTextView = getView().findViewById(R.id.currentWeather_clouds_value);
-        TextView precipitationTextView = getView().findViewById(R.id.currentWeather_precipitation_mode);
-        TextView windNameTextView = getView().findViewById(R.id.currentWeather_wind_name);
-        TextView windDirectionTextView = getView().findViewById(R.id.currentWeather_wind_direction);
-        TextView windSpeedTextView = getView().findViewById(R.id.currentWeather_wind_speed);
         placeTextView.setText(String.format("%s, %s", currentWeather.getCity().getName(), currentWeather.getCity().getCountry().getCountryCode()));
         sunriseTextView.setText(currentWeather.getCity().getSun().getRise());
         sunsetTextView.setText(currentWeather.getCity().getSun().getSet());
@@ -121,14 +118,14 @@ public class ActualWeatherFragment extends Fragment {
     }
 
     public void refreshCurrentWeather() throws IOException {
-        currentCity = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_city_key),
+        String currentCity = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_city_key),
                 getResources().getString(R.string.pref_weather_cities_default_city), getContext());
         currentCity = currentCity.replaceAll("\\s","");
-        units = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_units_key),
+        String units = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_units_key),
                 getResources().getString(R.string.pref_default_display_unit_value), getContext());
         try {
-            loadXmlFromNetworkAndRefreshData(firstUrlWeatherApiPart + currentCity +
-                    secondUrlWeatherApiPart + units);
+            loadXmlFromNetworkAndRefreshData(getString(R.string.firstPartOfWeatherWeatherApiUrl) + currentCity +
+                    getString(R.string.secondPartOfWeatherApiUrl) + units);
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         } catch (IOException e) {

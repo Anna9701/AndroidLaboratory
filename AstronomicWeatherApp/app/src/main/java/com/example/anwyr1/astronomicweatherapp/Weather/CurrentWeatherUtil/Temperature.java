@@ -23,6 +23,7 @@ public class Temperature implements Serializable {
     public String getUnit() {
         switch (unit) {
             case "metric":
+            case "celsius":
                 return "°C";
             case "kelvin":
                 return "K";

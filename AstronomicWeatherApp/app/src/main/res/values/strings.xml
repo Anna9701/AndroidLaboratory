@@ -125,4 +125,9 @@
     <string name="app_author">Anna Wyrwał</string>
     <string name="app_author_email">wyrwalanna13@gmail.com</string>
     <string name="refresh_weather_setting">Refresh weather data</string>
+    <string name="NullPrecipitationDescription">No precipitation</string>
+    <string name="firstPartOfForecastWeatherApiUrl">http://api.openweathermap.org/data/2.5/forecast?q=</string>
+    <string name="secondPartOfWeatherApiUrl"><![CDATA[&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=]]></string>
+    <string name="firstPartOfWeatherWeatherApiUrl">http://api.openweathermap.org/data/2.5/weather?q=</string>
+    <string name="currentForecastPeriodKey">currentForecastPeriodKey</string>
 </resources>
