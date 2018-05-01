@@ -28,8 +28,6 @@
     <include
         android:id="@+id/weather_activity"
         layout="@layout/weather_activity"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:visibility="gone" />
 
 </android.support.design.widget.CoordinatorLayout>

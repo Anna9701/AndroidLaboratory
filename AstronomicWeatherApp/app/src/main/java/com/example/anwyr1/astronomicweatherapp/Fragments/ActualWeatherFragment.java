@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.anwyr1.astronomicweatherapp.R;
 import com.example.anwyr1.astronomicweatherapp.SettingsActivity;
@@ -88,6 +89,37 @@ public class ActualWeatherFragment extends Fragment {
         thread.start();
     }
 
+    private void setCurrentWeatherView() {
+        TextView placeTextView = getView().findViewById(R.id.current_weather_place_name);
+        TextView sunriseTextView = getView().findViewById(R.id.current_weather_sunrise);
+        TextView sunsetTextView = getView().findViewById(R.id.current_weather_sunset);
+        TextView currentTempTextView = getView().findViewById(R.id.current_weather_temp_value);
+        TextView maxTempTextView = getView().findViewById(R.id.current_weather_temp_max);
+        TextView minTempTextView = getView().findViewById(R.id.current_weather_temp_min);
+        TextView tempUnitTextView = getView().findViewById(R.id.current_weather_temp_unit_name);
+        TextView humidityTextView = getView().findViewById(R.id.currentWeather_humidity_value);
+        TextView pressureTextView = getView().findViewById(R.id.currentWeather_pressure_value);
+        TextView cloudsTextView = getView().findViewById(R.id.currentWeather_clouds_value);
+        TextView precipitationTextView = getView().findViewById(R.id.currentWeather_precipitation_mode);
+        TextView windNameTextView = getView().findViewById(R.id.currentWeather_wind_name);
+        TextView windDirectionTextView = getView().findViewById(R.id.currentWeather_wind_direction);
+        TextView windSpeedTextView = getView().findViewById(R.id.currentWeather_wind_speed);
+        placeTextView.setText(String.format("%s, %s", currentWeather.getCity().getName(), currentWeather.getCity().getCountry().getCountryCode()));
+        sunriseTextView.setText(currentWeather.getCity().getSun().getRise());
+        sunsetTextView.setText(currentWeather.getCity().getSun().getSet());
+        tempUnitTextView.setText(currentWeather.getTemperature().getUnit());
+        currentTempTextView.setText(currentWeather.getTemperature().getValue());
+        maxTempTextView.setText(currentWeather.getTemperature().getMax());
+        minTempTextView.setText(currentWeather.getTemperature().getMin());
+        humidityTextView.setText(String.format("%s%s", currentWeather.getHumidity().getValue(), currentWeather.getHumidity().getUnit()));
+        pressureTextView.setText(String.format("%s %s", currentWeather.getPressure().getValue(), currentWeather.getPressure().getUnit()));
+        precipitationTextView.setText(String.format("precipitation: %s", currentWeather.getPrecipitation().getMode()));
+        cloudsTextView.setText(currentWeather.getClouds().getName());
+        windNameTextView.setText(currentWeather.getWind().getSpeed().getName());
+        windDirectionTextView.setText(currentWeather.getWind().getDirection().getName());
+        windSpeedTextView.setText(currentWeather.getWind().getSpeed().getValue());
+    }
+
     public void refreshCurrentWeather() throws IOException {
         currentCity = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_city_key),
                 getResources().getString(R.string.pref_weather_cities_default_city), getContext());
@@ -103,6 +135,7 @@ public class ActualWeatherFragment extends Fragment {
             e.printStackTrace();
             throw e;
         }
+        setCurrentWeatherView();
     }
 
     private void loadXmlFromNetworkAndRefreshData(String urlString) throws XmlPullParserException, IOException {

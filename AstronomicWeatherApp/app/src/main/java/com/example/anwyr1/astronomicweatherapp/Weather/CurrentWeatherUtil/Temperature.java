@@ -21,7 +21,14 @@ public class Temperature implements Serializable {
     }
 
     public String getUnit() {
-        return unit;
+        switch (unit) {
+            case "metric":
+                return "°C";
+            case "kelvin":
+                return "K";
+            default:
+                return "℉";
+        }
     }
 
     public void setUnit(String unit) {
