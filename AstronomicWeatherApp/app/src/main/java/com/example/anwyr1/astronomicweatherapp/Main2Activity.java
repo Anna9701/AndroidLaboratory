@@ -20,6 +20,7 @@ import com.example.anwyr1.astronomicweatherapp.Fragments.ForecastFragment;
 import com.example.anwyr1.astronomicweatherapp.Fragments.MoonFragment;
 import com.example.anwyr1.astronomicweatherapp.Fragments.SunFragment;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
@@ -31,14 +32,15 @@ public class Main2Activity extends AppCompatActivity
         ForecastFragment.OnFragmentInteractionListener,
         ActualWeatherFragment.OnFragmentInteractionListener {
 
+    private static ActualWeatherFragment actualWeatherFragment;
+    private static ForecastFragment forecastFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -49,6 +51,8 @@ public class Main2Activity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         setupCurrentTimeAndLocalization();
+        actualWeatherFragment = ((ActualWeatherFragment) getSupportFragmentManager().findFragmentById(R.id.fragment4b));
+        forecastFragment = ((ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment3b));
     }
 
     private void setupCurrentTimeAndLocalization() {
@@ -103,11 +107,8 @@ public class Main2Activity extends AppCompatActivity
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try  {
-                        ActualWeatherFragment actualWeatherFragment = ((ActualWeatherFragment) getSupportFragmentManager().findFragmentById(R.id.fragment4b));
-                        actualWeatherFragment.refreshCurrentWeather();
-                        ForecastFragment forecastFragment = ((ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment3b));
-                        forecastFragment.refreshCurrentWeather();
+                    try {
+                        refreshWeather();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -115,6 +116,11 @@ public class Main2Activity extends AppCompatActivity
             }).start();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public static void refreshWeather() throws IOException {
+        actualWeatherFragment.refreshCurrentWeather();
+        forecastFragment.refreshCurrentWeather();
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

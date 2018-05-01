@@ -26,13 +26,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * Created by anwyr1 on 29/04/2018.
- */
-
-public class ActualWeatherXmlParser {
-    // We don't use namespaces
-    private static final String ns = null;
+public class ActualWeatherXmlParser extends OpenWeatherApiXmlParser {
 
     public CurrentWeather parse(InputStream in) throws XmlPullParserException, IOException {
         try {
@@ -186,28 +180,6 @@ public class ActualWeatherXmlParser {
         return new Direction(value, code, name);
     }
 
-    private Temperature readTemperature(XmlPullParser parser) throws XmlPullParserException, IOException {
-        parser.require(XmlPullParser.START_TAG, ns, "temperature");
-        String value = parser.getAttributeValue(null, "value");
-        String min = parser.getAttributeValue(null, "min");
-        String max = parser.getAttributeValue(null, "max");
-        String unit = parser.getAttributeValue(null, "unit");
-        return new Temperature(value, min, max, unit);
-    }
-
-    private Humidity readHumidity(XmlPullParser parser) throws XmlPullParserException, IOException {
-        String value = parser.getAttributeValue(null, "value");
-        String unit = parser.getAttributeValue(null, "unit");
-        return new Humidity(value, unit);
-    }
-
-    private Pressure readPressure(XmlPullParser parser) throws XmlPullParserException, IOException {
-        parser.require(XmlPullParser.START_TAG, ns, "pressure");
-        String value = parser.getAttributeValue(null, "value");
-        String unit = parser.getAttributeValue(null, "unit");
-        return new Pressure(value, unit);
-    }
-
     // Parses the contents of an entry. If it encounters a title, summary, or link tag, hands them off
 // to their respective "read" methods for processing. Otherwise, skips the tag.
     private City readCity(XmlPullParser parser) throws XmlPullParserException, IOException {
@@ -256,20 +228,4 @@ public class ActualWeatherXmlParser {
         return new Country(code);
     }
 
-    private Sun readSun(XmlPullParser parser) throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, ns, "sun");
-        String rise = parser.getAttributeValue(null, "rise");
-        String set = parser.getAttributeValue(null, "set");
-        return new Sun(rise, set);
-    }
-
-    // For the tags title and summary, extracts their text values.
-    private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
-        String result = "";
-        if (parser.next() == XmlPullParser.TEXT) {
-            result = parser.getText();
-            parser.nextTag();
-        }
-        return result;
-    }
 }

@@ -25,9 +25,7 @@ import java.util.List;
  * Created by anwyr1 on 29/04/2018.
  */
 
-public class ForecastXmlParser {
-    // We don't use namespaces
-    private static final String ns = null;
+public class ForecastXmlParser extends OpenWeatherApiXmlParser{
 
     public ForecastData parse(InputStream in) throws XmlPullParserException, IOException {
         try {
@@ -145,28 +143,6 @@ public class ForecastXmlParser {
         return new Clouds(value, all, unit);
     }
 
-    private Humidity readHumidity(XmlPullParser parser) throws XmlPullParserException, IOException {
-        String value = parser.getAttributeValue(null, "value");
-        String unit = parser.getAttributeValue(null, "unit");
-        return new Humidity(value, unit);
-    }
-
-    private Pressure readPressure(XmlPullParser parser) throws XmlPullParserException, IOException {
-        parser.require(XmlPullParser.START_TAG, ns, "pressure");
-        String value = parser.getAttributeValue(null, "value");
-        String unit = parser.getAttributeValue(null, "unit");
-        return new Pressure(value, unit);
-    }
-
-    private Temperature readTemperature(XmlPullParser parser) throws XmlPullParserException, IOException {
-        parser.require(XmlPullParser.START_TAG, ns, "temperature");
-        String value = parser.getAttributeValue(null, "value");
-        String min = parser.getAttributeValue(null, "min");
-        String max = parser.getAttributeValue(null, "max");
-        String unit = parser.getAttributeValue(null, "unit");
-        return new Temperature(value, min, max, unit);
-    }
-
     private Wind readWind(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, "windDirection");
         String deg = parser.getAttributeValue(null, "deg");
@@ -198,42 +174,4 @@ public class ForecastXmlParser {
         return new Location(name, country, latitude, longitude);
     }
 
-    private void skipEmptyTag(XmlPullParser parser) throws IOException, XmlPullParserException {
-        parser.next();
-        parser.next();
-        parser.nextTag();
-    }
-
-    private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
-        String result = "";
-        if (parser.next() == XmlPullParser.TEXT) {
-            result = parser.getText();
-            parser.nextTag();
-        }
-        return result;
-    }
-
-    private Sun readSun(XmlPullParser parser) throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, ns, "sun");
-        String rise = parser.getAttributeValue(null, "rise");
-        String set = parser.getAttributeValue(null, "set");
-        return new Sun(rise, set);
-    }
-
-    private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
-        if (parser.getEventType() != XmlPullParser.START_TAG) {
-            throw new IllegalStateException();
-        }
-        int depth = 1;
-        while (depth != 0) {
-            switch (parser.next()) {
-                case XmlPullParser.END_TAG:
-                    depth--;
-                    break;
-                case XmlPullParser.START_TAG:
-                    depth++;
-                    break;
-            }
-        }
-    }
 }

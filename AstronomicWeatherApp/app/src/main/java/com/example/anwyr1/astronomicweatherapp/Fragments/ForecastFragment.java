@@ -31,6 +31,7 @@ import java.net.URL;
  * Use the {@link ForecastFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
+//TODO display forecast data
 public class ForecastFragment extends Fragment {
     private static final String firstUrlWeatherApiPart = "http://api.openweathermap.org/data/2.5/forecast?q=";
     private static final String secondUrlWeatherApiPart = "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=";
@@ -72,27 +73,16 @@ public class ForecastFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        currentCity = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_city_key),
-                getResources().getString(R.string.pref_weather_cities_default_city), getContext());
-        currentCity = currentCity.replaceAll("\\s","");
-        units = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_units_key),
-                getResources().getString(R.string.pref_default_display_unit_value), getContext());
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    loadXmlFromNetwork(firstUrlWeatherApiPart + currentCity + secondUrlWeatherApiPart + units);
-                } catch (XmlPullParserException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            refreshCurrentWeather();
             }
         });
         thread.start();
     }
 
-    private void loadXmlFromNetwork(String urlString) throws XmlPullParserException, IOException {
+    private void loadXmlFromNetworkAndRefreshData(String urlString) throws XmlPullParserException, IOException {
         InputStream stream = null;
         // Instantiate the parser
         ForecastXmlParser forecastXmlParser = new ForecastXmlParser();
@@ -141,8 +131,13 @@ public class ForecastFragment extends Fragment {
     }
 
     public void refreshCurrentWeather() {
+        currentCity = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_city_key),
+                getResources().getString(R.string.pref_weather_cities_default_city), getContext());
+        currentCity = currentCity.replaceAll("\\s","");
+        units = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_units_key),
+                getResources().getString(R.string.pref_default_display_unit_value), getContext());
         try {
-            loadXmlFromNetwork(firstUrlWeatherApiPart + currentCity +
+            loadXmlFromNetworkAndRefreshData(firstUrlWeatherApiPart + currentCity +
                     secondUrlWeatherApiPart + units);
         } catch (XmlPullParserException e) {
             e.printStackTrace();

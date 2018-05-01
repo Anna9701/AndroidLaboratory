@@ -12,16 +12,24 @@ import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
+import android.view.MenuItem;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -53,14 +61,17 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * to reflect its new value.
      */
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
+        final String invalidCityTitle = "Invalid City Selected";
+        final String invalidCityContent = "Something's gone wrong... There is no such city or you have no access to Internet.";
+
         @Override
-        public boolean onPreferenceChange(Preference preference, Object value) {
-            String stringValue = value.toString();
+        public boolean onPreferenceChange(final Preference preference, Object value) {
+            final String stringValue = value.toString();
 
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
                 // the preference's 'entries' list.
-                ListPreference listPreference = (ListPreference) preference;
+                final ListPreference listPreference = (ListPreference) preference;
                 int index = listPreference.findIndexOfValue(stringValue);
 
                 // Set the summary to reflect the new value.
@@ -68,13 +79,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         index >= 0
                                 ? listPreference.getEntries()[index]
                                 : null);
+                if (preference.getKey().equals("selected_city")) {
+                    return updateSelectedCity(preference, stringValue);
+                }
             } else if (preference instanceof EditTextPreference && (preference.getKey().equals("latitude")
                     || preference.getKey().equals("longitude"))) {
                 if (!updateLatitudeOrLongitude(preference, stringValue))
                     return false;
             } else if (preference instanceof EditTextPreference) {
-                updateProperFavoriteCity(preference, stringValue);
-                preference.setSummary(stringValue);
+                if (updateProperFavoriteCity(preference, stringValue))
+                    preference.setSummary(stringValue);
             } else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
@@ -83,48 +97,138 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return true;
         }
 
-        //TODO check if entered city is valid
-        private void updateProperFavoriteCity(Preference preference, String stringValue) {
+        private boolean updateSelectedCity(final Preference preference, final String stringValue) {
+            final String oldValue = SettingsActivity.getFromSettings("selected_city", stringValue, preference.getContext());
+            ExecutorService es = Executors.newSingleThreadExecutor();
+            Future<Boolean> result = es.submit(new Callable<Boolean>() {
+                public Boolean call() throws Exception {
+                    try {
+                        SettingsActivity.setSettings("selected_city", stringValue, preference.getContext());
+                        Main2Activity.refreshWeather();
+                    } catch (IOException e) {
+                        SettingsActivity.setSettings("selected_city", oldValue, preference.getContext());
+                        e.printStackTrace();
+                        return false;
+                    }
+                    return true;
+                }
+            });
+            try {
+                if(!result.get()) {
+                    es.shutdown();
+                    ((ListPreference) preference).setValue(oldValue);
+                    preference.setSummary(oldValue);
+                    displayAlert(invalidCityTitle, invalidCityContent, preference.getContext());
+                    return false;
+                }
+            } catch (Exception e) {
+                ((ListPreference) preference).setValue(oldValue);
+                preference.setSummary(oldValue);
+                displayAlert(invalidCityTitle, invalidCityContent, preference.getContext());
+                return false;
+            }
+            return true;
+        }
+
+        private boolean updateProperFavoriteCity(Preference preference, String stringValue) {
+            int numberOfCity;
+            final int numberOfCities = 5;
             String key = preference.getKey();
-            switch (key) {
-                case "city1_value":
+            for (numberOfCity = 0 ; numberOfCity < numberOfCities; ++numberOfCity) {
+                if (key.equals("city" + (int) (numberOfCity + 1) + "_value"))
+                    break;
+            }
+
+            if (!isCityValid(stringValue, numberOfCity)) {
+                displayAlert(invalidCityTitle, invalidCityContent, preference.getContext());
+                return false;
+            }
+
+            switch (numberOfCity) {
+                case 0:
                     city1 = stringValue;
                     break;
-                case "city2_value":
+                case 1:
                     city2 = stringValue;
                     break;
-                case "city3_value":
+                case 2:
                     city3 = stringValue;
                     break;
-                case "city4_value":
+                case 3:
                     city4 = stringValue;
                     break;
-                case "city5_value":
+                case 4:
                     city5 = stringValue;
                     break;
                 default:
-                    return;
+                    return false;
             }
             NotificationPreferenceFragment.loadCitiesListEntries();
+            return true;
+        }
+
+        private boolean isCityValid(String cityName, int numberOfCity) {
+            if (cityName.length() == 0 && numberOfCity > 0)
+                return true;
+            final String city = cityName.replaceAll("\\s","");
+            final String firstUrlWeatherApiPart = "http://api.openweathermap.org/data/2.5/weather?q=";
+            final String secondUrlWeatherApiPart = "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=";
+            ExecutorService es = Executors.newSingleThreadExecutor();
+            Future<Boolean> result = es.submit(new Callable<Boolean>() {
+                public Boolean call() throws Exception {
+                    try {
+                        InputStream stream = downloadUrl(firstUrlWeatherApiPart + city + secondUrlWeatherApiPart);
+                    } catch (IOException e) {
+                        return false;
+                    }
+                    return true;
+                }
+            });
+            try {
+                if(!result.get()) {
+                    es.shutdown();
+                    return false;
+                }
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
+        }
+
+        private InputStream downloadUrl(String urlString) throws IOException {
+            URL url = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(1000 /* milliseconds */);
+            conn.setConnectTimeout(1500 /* milliseconds */);
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+            // Starts the query
+            conn.connect();
+            return conn.getInputStream();
         }
 
         private boolean updateLatitudeOrLongitude(Preference preference, String stringValue) {
             if (!NumberUtils.isParsable(stringValue)
                     || Double.parseDouble(stringValue) <= -90
                     || Double.parseDouble(stringValue) >= 90) {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(preference.getContext());
-                builder.setTitle("Invalid Input");
-                builder.setMessage("Something's gone wrong...");
-                builder.setPositiveButton(android.R.string.ok, null);
-                builder.show();
+                final String invalidCoordsTitle = "Invalid Input";
+                final String invalidCoordsContent = "Something's gone wrong...";
+                displayAlert(invalidCoordsTitle, invalidCoordsContent, preference.getContext());
                 return false;
             }
             preference.setSummary(stringValue);
             return true;
         }
 
-
+        private void displayAlert(final String title, final String content, final Context context) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle(title);
+            builder.setMessage(content);
+            builder.setPositiveButton(android.R.string.ok, null);
+            builder.show();
+        }
     };
+
 
     /**
      * Helper method to determine if the device has an extra-large screen. For
