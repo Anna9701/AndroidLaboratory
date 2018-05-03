@@ -17,38 +17,30 @@ import com.example.anwyr1.astronomicweatherapp.SettingsActivity;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
  * {@link SunFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link SunFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class SunFragment extends Fragment {
     private static final int MillisecondsInSecond = 1000;
     private static Timer timer;
-
     private OnFragmentInteractionListener mListener;
+
+    @BindView(R.id.sunriseTime) TextView sunriseDate;
+    @BindView(R.id.sunriseAzimuth)TextView sunriseAzimuth;
+    @BindView(R.id.sunsetTime)TextView sunsetDate;
+    @BindView(R.id.sunsetAzimuth)TextView sunsetAzimuth;
+    @BindView(R.id.civilSunrise)TextView civilSunrise;
+    @BindView(R.id.civilSunset)TextView civilSunset;
 
     public SunFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SunFragment.
-     */
-    public static SunFragment newInstance(String param1, String param2) {
-        SunFragment fragment = new SunFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
@@ -59,14 +51,10 @@ public class SunFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sun, container, false);
-    }
 
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+        ViewGroup viewGroup = (ViewGroup) inflater.inflate(R.layout.fragment_sun, container, false);
+        ButterKnife.bind(this, viewGroup);
+        return viewGroup;
     }
 
     @Override
@@ -118,12 +106,6 @@ public class SunFragment extends Fragment {
     private void loadSunRelatedData() {
         AstronomicCalculator astronomicCalculator = AstronomicCalculator.getInstance(getContext());
         AstroCalculator.SunInfo sunInfo = astronomicCalculator.getAstroCalculator().getSunInfo();
-        final TextView sunriseDate = getView().findViewById(R.id.sunriseTime);
-        final TextView sunriseAzimuth = getView().findViewById(R.id.sunriseAzimuth);
-        final TextView sunsetDate = getView().findViewById(R.id.sunsetTime);
-        final TextView sunsetAzimuth = getView().findViewById(R.id.sunsetAzimuth);
-        final TextView civilSunrise = getView().findViewById(R.id.civilSunrise);
-        final TextView civilSunset = getView().findViewById(R.id.civilSunset);
         sunriseDate.setText(sunInfo.getSunrise().toString());
         sunriseAzimuth.setText(String.valueOf(sunInfo.getAzimuthRise()));
         sunsetDate.setText(sunInfo.getSunset().toString());

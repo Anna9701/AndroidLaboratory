@@ -18,37 +18,29 @@ import com.example.anwyr1.astronomicweatherapp.SettingsActivity;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
  * {@link MoonFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MoonFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class MoonFragment extends Fragment {
     private static final int MillisecondsInSecond = 1000;
     private static Timer timer;
-
     private OnFragmentInteractionListener mListener;
+
+    @BindView(R.id.moonRise)TextView moonriseDate;
+    @BindView(R.id.moonSet)TextView moonSetDate;
+    @BindView(R.id.nextNewMoon)TextView nextNewMoon;
+    @BindView(R.id.nextFullMoon)TextView nextFullMoon;
+    @BindView(R.id.illumination)TextView illumination;
+    @BindView(R.id.monthAge)TextView monthAge;
 
     public MoonFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MoonFragment.
-     */
-    public static MoonFragment newInstance(String param1, String param2) {
-        MoonFragment fragment = new MoonFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
@@ -59,9 +51,9 @@ public class MoonFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-
-        return inflater.inflate(R.layout.fragment_moon, container, true);
+        ViewGroup viewGroup = (ViewGroup) inflater.inflate(R.layout.fragment_moon, container, false);
+        ButterKnife.bind(this, viewGroup);
+        return viewGroup;
     }
 
     @Override
@@ -83,12 +75,6 @@ public class MoonFragment extends Fragment {
                 });
             }
         }, 0, time);
-    }
-
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
@@ -118,12 +104,6 @@ public class MoonFragment extends Fragment {
     private void loadMoonRelatedData() {
         AstronomicCalculator astronomicCalculator = AstronomicCalculator.getInstance(getContext());
         AstroCalculator.MoonInfo moonInfo = astronomicCalculator.getAstroCalculator().getMoonInfo();
-        final TextView moonriseDate = getView().findViewById(R.id.moonRise);
-        final TextView moonSetDate = getView().findViewById(R.id.moonSet);
-        final TextView nextNewMoon = getView().findViewById(R.id.nextNewMoon);
-        final TextView nextFullMoon = getView().findViewById(R.id.nextFullMoon);
-        final TextView illumination = getView().findViewById(R.id.illumination);
-        final TextView monthAge = getView().findViewById(R.id.monthAge);
         try {
             moonriseDate.setText(moonInfo.getMoonrise().toString());
             moonSetDate.setText(moonInfo.getMoonset().toString());
