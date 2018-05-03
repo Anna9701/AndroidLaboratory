@@ -21,8 +21,11 @@ import com.example.anwyr1.astronomicweatherapp.Fragments.MoonFragment;
 import com.example.anwyr1.astronomicweatherapp.Fragments.SunFragment;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,6 +40,7 @@ public class Main2Activity extends AppCompatActivity
     private final static String calendarMode = "calendar";
     private final static String weatherMode = "weather";
     private static String mode = calendarMode;
+    private static DateFormat dateFormatOut = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.GERMAN);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +78,8 @@ public class Main2Activity extends AppCompatActivity
                         String longitude = SettingsActivity.getFromSettings("longitude",
                                 getString(R.string.pref_default_display_longitude), context);
                         Date currentTime = Calendar.getInstance().getTime();
-                        textView.setText(String.format("%s, %s \n%s", latitude, longitude, currentTime.toString()));
+                        String time = dateFormatOut.format(currentTime);
+                        textView.setText(String.format("%s, %s \n%s", latitude, longitude, time));
                     }
                 });
             }

@@ -101,20 +101,29 @@ public class ActualWeatherFragment extends Fragment {
     }
 
     private void setCurrentWeatherView() {
-        placeTextView.setText(String.format("%s, %s", currentWeather.getCity().getName(), currentWeather.getCity().getCountry().getCountryCode()));
-        sunriseTextView.setText(currentWeather.getCity().getSun().getRise());
-        sunsetTextView.setText(currentWeather.getCity().getSun().getSet());
-        tempUnitTextView.setText(currentWeather.getTemperature().getUnit());
-        currentTempTextView.setText(currentWeather.getTemperature().getValue());
-        maxTempTextView.setText(currentWeather.getTemperature().getMax());
-        minTempTextView.setText(currentWeather.getTemperature().getMin());
-        humidityTextView.setText(String.format("%s%s", currentWeather.getHumidity().getValue(), currentWeather.getHumidity().getUnit()));
-        pressureTextView.setText(String.format("%s %s", currentWeather.getPressure().getValue(), currentWeather.getPressure().getUnit()));
-        precipitationTextView.setText(String.format("precipitation: %s", currentWeather.getPrecipitation().getMode()));
-        cloudsTextView.setText(currentWeather.getClouds().getName());
-        windNameTextView.setText(currentWeather.getWind().getSpeed().getName());
-        windDirectionTextView.setText(currentWeather.getWind().getDirection().getName());
-        windSpeedTextView.setText(currentWeather.getWind().getSpeed().getValue());
+        try {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    placeTextView.setText(String.format("%s, %s", currentWeather.getCity().getName(), currentWeather.getCity().getCountry().getCountryCode()));
+                    sunriseTextView.setText(currentWeather.getCity().getSun().getRise());
+                    sunsetTextView.setText(currentWeather.getCity().getSun().getSet());
+                    tempUnitTextView.setText(currentWeather.getTemperature().getUnit());
+                    currentTempTextView.setText(currentWeather.getTemperature().getValue());
+                    maxTempTextView.setText(currentWeather.getTemperature().getMax());
+                    minTempTextView.setText(currentWeather.getTemperature().getMin());
+                    humidityTextView.setText(String.format("%s%s", currentWeather.getHumidity().getValue(), currentWeather.getHumidity().getUnit()));
+                    pressureTextView.setText(String.format("%s %s", currentWeather.getPressure().getValue(), currentWeather.getPressure().getUnit()));
+                    precipitationTextView.setText(String.format("precipitation: %s", currentWeather.getPrecipitation().getMode()));
+                    cloudsTextView.setText(currentWeather.getClouds().getName());
+                    windNameTextView.setText(currentWeather.getWind().getSpeed().getName());
+                    windDirectionTextView.setText(currentWeather.getWind().getDirection().getName());
+                    windSpeedTextView.setText(currentWeather.getWind().getSpeed().getValue());
+                }
+            });
+        } catch (NullPointerException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void refreshCurrentWeather() throws IOException {

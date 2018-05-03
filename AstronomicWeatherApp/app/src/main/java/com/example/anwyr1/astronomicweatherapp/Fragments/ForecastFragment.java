@@ -197,30 +197,39 @@ public class ForecastFragment extends Fragment {
     }
 
     private void updateDataView() {
-        ThreeHoursForecast forecast = forecastData.getForecastList().get(currentForecastPeriod);
-        generalWeatherDescriptionTextView.setText(forecast.getWeatherCondition());
-        timeFromTextView.setText(forecast.getTime().getFrom());
-        timeToTextView.setText(forecast.getTime().getTo());
-        windNameTextView.setText(forecast.getWind().getSpeedName());
-        windDirectionTextView.setText(forecast.getWind().getDirection());
-        windSpeedTextView.setText(forecast.getWind().getWindSpeedMps());
-        tempAvgTextView.setText(forecast.getTemperature().getValue());
-        tempMaxTextView.setText(forecast.getTemperature().getMax());
-        tempMinTextView.setText(forecast.getTemperature().getMin());
-        tempUnitTextView.setText(forecast.getTemperature().getUnit());
-        humidityTextView.setText(String.format("%s %s", forecast.getHumidity().getValue(), forecast.getHumidity().getUnit()));
-        pressureTextView.setText(String.format("%s %s", forecast.getPressure().getValue(), forecast.getPressure().getUnit()));
-        cloudsDescTextView.setText(forecast.getClouds().getValue());
-        cloudsAllValueTextView.setText(String.format("Cloudiness: %s%s", forecast.getClouds().getAll(), forecast.getClouds().getUnit()));
-        Precipitation precipitation = forecast.getPrecipitation();
-        if (precipitation != null) {
-            precipitationAmountTextView.setText(precipitation.getValue());
-            precipitationTypeTextView.setText(precipitation.getType());
-            precipitationNullTextView.setText("");
-        } else {
-            precipitationTypeTextView.setText("");
-            precipitationAmountTextView.setText("");
-            precipitationNullTextView.setText(R.string.NullPrecipitationDescription);
+        try {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ThreeHoursForecast forecast = forecastData.getForecastList().get(currentForecastPeriod);
+                    generalWeatherDescriptionTextView.setText(forecast.getWeatherCondition());
+                    timeFromTextView.setText(forecast.getTime().getFrom());
+                    timeToTextView.setText(forecast.getTime().getTo());
+                    windNameTextView.setText(forecast.getWind().getSpeedName());
+                    windDirectionTextView.setText(forecast.getWind().getDirection());
+                    windSpeedTextView.setText(forecast.getWind().getWindSpeedMps());
+                    tempAvgTextView.setText(forecast.getTemperature().getValue());
+                    tempMaxTextView.setText(forecast.getTemperature().getMax());
+                    tempMinTextView.setText(forecast.getTemperature().getMin());
+                    tempUnitTextView.setText(forecast.getTemperature().getUnit());
+                    humidityTextView.setText(String.format("%s %s", forecast.getHumidity().getValue(), forecast.getHumidity().getUnit()));
+                    pressureTextView.setText(String.format("%s %s", forecast.getPressure().getValue(), forecast.getPressure().getUnit()));
+                    cloudsDescTextView.setText(forecast.getClouds().getValue());
+                    cloudsAllValueTextView.setText(String.format("Cloudiness: %s%s", forecast.getClouds().getAll(), forecast.getClouds().getUnit()));
+                    Precipitation precipitation = forecast.getPrecipitation();
+                    if (precipitation != null) {
+                        precipitationAmountTextView.setText(precipitation.getValue());
+                        precipitationTypeTextView.setText(precipitation.getType());
+                        precipitationNullTextView.setText("");
+                    } else {
+                        precipitationTypeTextView.setText("");
+                        precipitationAmountTextView.setText("");
+                        precipitationNullTextView.setText(R.string.NullPrecipitationDescription);
+                    }
+                }
+            });
+        } catch (NullPointerException ex) {
+            ex.printStackTrace();
         }
     }
 

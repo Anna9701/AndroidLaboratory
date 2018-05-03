@@ -1,10 +1,12 @@
 package com.example.anwyr1.astronomicweatherapp.Forecast.ForecastUtils;
 
+import java.io.Serializable;
+
 /**
  * Created by anwyr1 on 01/05/2018.
  */
 
-public class Precipitation {
+public class Precipitation implements Serializable {
     private String value;
     private String type;
 

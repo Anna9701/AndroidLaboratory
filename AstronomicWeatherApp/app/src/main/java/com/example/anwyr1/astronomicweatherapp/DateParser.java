@@ -22,6 +22,9 @@ public class DateParser {
             return dateString;
         }
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+0"));
-        return dateFormat.format(date);
+        DateFormat dateFormatOut = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.GERMAN);
+        return dateFormatOut.format(date);
     }
 }
+
+//TODO fix validation of inputted city
