@@ -20,6 +20,8 @@ import java.util.TimerTask;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.example.anwyr1.astronomicweatherapp.DateUtil.convertAstronomicData;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -106,12 +108,12 @@ public class SunFragment extends Fragment {
     private void loadSunRelatedData() {
         AstronomicCalculator astronomicCalculator = AstronomicCalculator.getInstance(getContext());
         AstroCalculator.SunInfo sunInfo = astronomicCalculator.getAstroCalculator().getSunInfo();
-        sunriseDate.setText(sunInfo.getSunrise().toString());
+        sunriseDate.setText(convertAstronomicData(sunInfo.getSunrise().toString()));
         sunriseAzimuth.setText(String.valueOf(sunInfo.getAzimuthRise()));
-        sunsetDate.setText(sunInfo.getSunset().toString());
+        sunsetDate.setText(convertAstronomicData(sunInfo.getSunset().toString()));
         sunsetAzimuth.setText(String.valueOf(sunInfo.getAzimuthSet()));
-        civilSunrise.setText(sunInfo.getTwilightMorning().toString());
-        civilSunset.setText(sunInfo.getTwilightEvening().toString());
+        civilSunrise.setText(convertAstronomicData(sunInfo.getTwilightMorning().toString()));
+        civilSunset.setText(convertAstronomicData(sunInfo.getTwilightEvening().toString()));
     }
 
     /**

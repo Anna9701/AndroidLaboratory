@@ -1,6 +1,6 @@
 package com.example.anwyr1.astronomicweatherapp.Weather.CityUtil;
 
-import com.example.anwyr1.astronomicweatherapp.DateParser;
+import com.example.anwyr1.astronomicweatherapp.DateUtil;
 
 import java.io.Serializable;
 
@@ -18,7 +18,7 @@ public class Sun implements Serializable {
     }
 
     public String getSet() {
-        return DateParser.changeTimezoneToCurrent(set);
+        return DateUtil.changeTimezoneToCurrent(set);
     }
 
     public void setSet(String set) {
@@ -26,7 +26,7 @@ public class Sun implements Serializable {
     }
 
     public String getRise() {
-        return DateParser.changeTimezoneToCurrent(rise);
+        return DateUtil.changeTimezoneToCurrent(rise);
     }
 
     public void setRise(String rise) {

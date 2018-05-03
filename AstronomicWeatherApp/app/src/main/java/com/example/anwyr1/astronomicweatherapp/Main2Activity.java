@@ -20,11 +20,6 @@ import com.example.anwyr1.astronomicweatherapp.Fragments.ForecastFragment;
 import com.example.anwyr1.astronomicweatherapp.Fragments.MoonFragment;
 import com.example.anwyr1.astronomicweatherapp.Fragments.SunFragment;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -42,12 +37,13 @@ public class Main2Activity extends AppCompatActivity
     private final static String calendarMode = "calendar";
     private final static String weatherMode = "weather";
     private static String mode = calendarMode;
-    private static final DateFormat dateFormatOut = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.GERMAN);
 
     @BindView(R.id.toolbar)Toolbar toolbar;
     @BindView(R.id.drawer_layout)DrawerLayout drawer;
     @BindView(R.id.nav_view) NavigationView navigationView;
     @BindView(R.id.dataHeader)TextView dataHeaderView;
+    @BindView(R.id.main_activity)View astroCalendarView;
+    @BindView(R.id.weather_activity)View weatherView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,9 +76,8 @@ public class Main2Activity extends AppCompatActivity
                                 getString(R.string.pref_default_display_latitude), context);
                         String longitude = SettingsActivity.getFromSettings("longitude",
                                 getString(R.string.pref_default_display_longitude), context);
-                        Date currentTime = Calendar.getInstance().getTime();
-                        String time = dateFormatOut.format(currentTime);
-                        dataHeaderView.setText(String.format("%s, %s \n%s", latitude, longitude, time));
+                        dataHeaderView.setText(String.format("%s, %s \n%s", latitude, longitude,
+                                DateUtil.getCurrentDate()));
                     }
                 });
             }
@@ -153,13 +148,13 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void setWeatherMode() {
-        findViewById(R.id.main_activity).setVisibility(View.GONE);
-        findViewById(R.id.weather_activity).setVisibility(View.VISIBLE);
+        astroCalendarView.setVisibility(View.GONE);
+        weatherView.setVisibility(View.VISIBLE);
     }
 
     private void setCalendarMode() {
-        findViewById(R.id.main_activity).setVisibility(View.VISIBLE);
-        findViewById(R.id.weather_activity).setVisibility(View.GONE);
+        astroCalendarView.setVisibility(View.VISIBLE);
+        weatherView.setVisibility(View.GONE);
     }
 
     @Override

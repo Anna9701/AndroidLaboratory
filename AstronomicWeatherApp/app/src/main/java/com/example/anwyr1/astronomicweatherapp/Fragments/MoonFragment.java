@@ -21,6 +21,8 @@ import java.util.TimerTask;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.example.anwyr1.astronomicweatherapp.DateUtil.convertAstronomicData;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -105,10 +107,10 @@ public class MoonFragment extends Fragment {
         AstronomicCalculator astronomicCalculator = AstronomicCalculator.getInstance(getContext());
         AstroCalculator.MoonInfo moonInfo = astronomicCalculator.getAstroCalculator().getMoonInfo();
         try {
-            moonriseDate.setText(moonInfo.getMoonrise().toString());
-            moonSetDate.setText(moonInfo.getMoonset().toString());
-            nextNewMoon.setText(moonInfo.getNextNewMoon().toString());
-            nextFullMoon.setText(moonInfo.getNextFullMoon().toString());
+            moonriseDate.setText(convertAstronomicData(moonInfo.getMoonrise().toString()));
+            moonSetDate.setText(convertAstronomicData(moonInfo.getMoonset().toString()));
+            nextNewMoon.setText(convertAstronomicData(moonInfo.getNextNewMoon().toString()));
+            nextFullMoon.setText(convertAstronomicData(moonInfo.getNextFullMoon().toString()));
             illumination.setText(String.valueOf(moonInfo.getIllumination()));
             monthAge.setText(String.valueOf(moonInfo.getAge()));
         } catch (NullPointerException ex) {
