@@ -80,7 +80,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                 ? listPreference.getEntries()[index]
                                 : null);
                 if (preference.getKey().equals("selected_city")) {
-                    return updateSelectedCity(preference, stringValue);
+                    return isCityValid(stringValue);
                 }
             } else if (preference instanceof EditTextPreference && (preference.getKey().equals("latitude")
                     || preference.getKey().equals("longitude"))) {
@@ -89,43 +89,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             } else if (preference instanceof EditTextPreference) {
                 if (updateProperFavoriteCity(preference, stringValue))
                     preference.setSummary(stringValue);
+                else
+                    return false;
             } else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
                 preference.setSummary(stringValue);
-            }
-            return true;
-        }
-
-        private boolean updateSelectedCity(final Preference preference, final String stringValue) {
-            final String oldValue = SettingsActivity.getFromSettings("selected_city", stringValue, preference.getContext());
-            ExecutorService es = Executors.newSingleThreadExecutor();
-            Future<Boolean> result = es.submit(new Callable<Boolean>() {
-                public Boolean call() throws Exception {
-                    try {
-                        SettingsActivity.setSettings("selected_city", stringValue, preference.getContext());
-                        Main2Activity.refreshWeather();
-                    } catch (IOException e) {
-                        SettingsActivity.setSettings("selected_city", oldValue, preference.getContext());
-                        e.printStackTrace();
-                        return false;
-                    }
-                    return true;
-                }
-            });
-            try {
-                if(!result.get()) {
-                    es.shutdown();
-                    ((ListPreference) preference).setValue(oldValue);
-                    preference.setSummary(oldValue);
-                    displayAlert(invalidCityTitle, invalidCityContent, preference.getContext());
-                    return false;
-                }
-            } catch (Exception e) {
-                ((ListPreference) preference).setValue(oldValue);
-                preference.setSummary(oldValue);
-                displayAlert(invalidCityTitle, invalidCityContent, preference.getContext());
-                return false;
             }
             return true;
         }
@@ -135,7 +104,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             final int numberOfCities = 5;
             String key = preference.getKey();
             for (numberOfCity = 0 ; numberOfCity < numberOfCities; ++numberOfCity) {
-                if (key.equals("city" + (int) (numberOfCity + 1) + "_value"))
+                if (key.equals("city" + (numberOfCity + 1) + "_value"))
                     break;
             }
 
@@ -167,17 +136,23 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return true;
         }
 
-        private boolean isCityValid(String cityName, int numberOfCity) {
-            if (cityName.length() == 0 && numberOfCity > 0)
+        private boolean isCityValid(String city, int numberOfCity) {
+            if (city.length() == 0 && numberOfCity > 0)
                 return true;
-            final String city = cityName.replaceAll("\\s","");
+            final String cityId = city.replaceAll("\\s","");
+            return isCityValid(cityId);
+        }
+
+        private boolean isCityValid(final String cityId) {
+            if(!cityId.matches("[A-Za-z].*,*[A-Za-z].*"))
+                return false;
             final String firstUrlWeatherApiPart = "http://api.openweathermap.org/data/2.5/weather?q=";
             final String secondUrlWeatherApiPart = "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=";
             ExecutorService es = Executors.newSingleThreadExecutor();
             Future<Boolean> result = es.submit(new Callable<Boolean>() {
                 public Boolean call() throws Exception {
                     try {
-                        InputStream stream = downloadUrl(firstUrlWeatherApiPart + city + secondUrlWeatherApiPart);
+                        downloadUrl(firstUrlWeatherApiPart + cityId + secondUrlWeatherApiPart);
                     } catch (IOException e) {
                         return false;
                     }

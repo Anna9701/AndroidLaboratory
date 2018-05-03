@@ -14,14 +14,14 @@ import java.util.TimeZone;
 public class DateParser {
     public static String changeTimezoneToCurrent(String dateString) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.GERMAN);
-        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-2"));
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-0"));
         Date date = null;
         try {
             date = dateFormat.parse(dateString);
         } catch (ParseException e) {
             return dateString;
         }
-        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+0"));
+      //  dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+0"));
         DateFormat dateFormatOut = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.GERMAN);
         return dateFormatOut.format(date);
     }

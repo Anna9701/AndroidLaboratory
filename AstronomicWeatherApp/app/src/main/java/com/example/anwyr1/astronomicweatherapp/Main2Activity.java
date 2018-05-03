@@ -20,7 +20,6 @@ import com.example.anwyr1.astronomicweatherapp.Fragments.ForecastFragment;
 import com.example.anwyr1.astronomicweatherapp.Fragments.MoonFragment;
 import com.example.anwyr1.astronomicweatherapp.Fragments.SunFragment;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -29,33 +28,38 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         MoonFragment.OnFragmentInteractionListener, SunFragment.OnFragmentInteractionListener,
         ForecastFragment.OnFragmentInteractionListener,
         ActualWeatherFragment.OnFragmentInteractionListener {
 
-    private static ActualWeatherFragment actualWeatherFragment;
-    private static ForecastFragment forecastFragment;
+    private ActualWeatherFragment actualWeatherFragment;
+    private ForecastFragment forecastFragment;
     private final static String calendarMode = "calendar";
     private final static String weatherMode = "weather";
     private static String mode = calendarMode;
-    private static DateFormat dateFormatOut = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.GERMAN);
+    private static final DateFormat dateFormatOut = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.GERMAN);
+
+    @BindView(R.id.toolbar)Toolbar toolbar;
+    @BindView(R.id.drawer_layout)DrawerLayout drawer;
+    @BindView(R.id.nav_view) NavigationView navigationView;
+    @BindView(R.id.dataHeader)TextView dataHeaderView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         setupCurrentTimeAndLocalization();
         actualWeatherFragment = ((ActualWeatherFragment) getSupportFragmentManager().findFragmentById(R.id.fragment4b));
@@ -65,7 +69,6 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void setupCurrentTimeAndLocalization() {
-        final TextView textView = findViewById(R.id.dataHeader);
         final Context context = this;
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -79,7 +82,7 @@ public class Main2Activity extends AppCompatActivity
                                 getString(R.string.pref_default_display_longitude), context);
                         Date currentTime = Calendar.getInstance().getTime();
                         String time = dateFormatOut.format(currentTime);
-                        textView.setText(String.format("%s, %s \n%s", latitude, longitude, time));
+                        dataHeaderView.setText(String.format("%s, %s \n%s", latitude, longitude, time));
                     }
                 });
             }
@@ -88,7 +91,6 @@ public class Main2Activity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -128,7 +130,7 @@ public class Main2Activity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    public static void refreshWeather() throws IOException {
+    public void refreshWeather() {
         actualWeatherFragment.refreshCurrentWeather();
         forecastFragment.refreshCurrentWeather();
     }
@@ -146,7 +148,6 @@ public class Main2Activity extends AppCompatActivity
             mode = calendarMode;
             setCalendarMode();
         }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

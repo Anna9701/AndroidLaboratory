@@ -90,11 +90,7 @@ public class ActualWeatherFragment extends Fragment {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    refreshCurrentWeather();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            refreshCurrentWeather();
             }
         });
         thread.start();
@@ -126,7 +122,7 @@ public class ActualWeatherFragment extends Fragment {
         }
     }
 
-    public void refreshCurrentWeather() throws IOException {
+    public void refreshCurrentWeather() {
         String currentCity = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_city_key),
                 getResources().getString(R.string.pref_weather_cities_default_city), getContext());
         currentCity = currentCity.replaceAll("\\s","");
@@ -135,11 +131,8 @@ public class ActualWeatherFragment extends Fragment {
         try {
             loadXmlFromNetworkAndRefreshData(getString(R.string.firstPartOfWeatherWeatherApiUrl) + currentCity +
                     getString(R.string.secondPartOfWeatherApiUrl) + units);
-        } catch (XmlPullParserException e) {
+        } catch (XmlPullParserException | IOException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw e;
         }
         setCurrentWeatherView();
     }
