@@ -43,6 +43,8 @@ public class ForecastFragment extends Fragment {
     private static ForecastData forecastData;
     private static int currentForecastPeriod = 0;
     private OnFragmentInteractionListener mListener;
+
+    @BindView(R.id.cityTextView)TextView cityNameTextView;
     @BindView(R.id.forecast_0_general_weather_description)TextView generalWeatherDescriptionTextView;
     @BindView(R.id.forecast_0_time_from)TextView timeFromTextView;
     @BindView(R.id.forecast_0_time_to)TextView timeToTextView;
@@ -202,6 +204,8 @@ public class ForecastFragment extends Fragment {
                 @Override
                 public void run() {
                     ThreeHoursForecast forecast = forecastData.getForecastList().get(currentForecastPeriod);
+                    cityNameTextView.setText(String.format("%s, %s", forecastData.getLocation().getName(),
+                            forecastData.getLocation().getCountry()));
                     generalWeatherDescriptionTextView.setText(forecast.getWeatherCondition());
                     timeFromTextView.setText(forecast.getTime().getFrom());
                     timeToTextView.setText(forecast.getTime().getTo());
