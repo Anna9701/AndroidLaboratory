@@ -32,6 +32,11 @@ import static com.example.anwyr1.astronomicweatherapp.DateUtil.convertAstronomic
  * to handle interaction events.
  */
 public class MoonFragment extends Fragment {
+
+    public interface OnFragmentInteractionListener {
+        void onFragmentInteraction(Uri uri);
+    }
+
     private OnFragmentInteractionListener mListener;
 
     @BindView(R.id.moonRise)TextView moonriseDate;
@@ -41,9 +46,7 @@ public class MoonFragment extends Fragment {
     @BindView(R.id.illumination)TextView illumination;
     @BindView(R.id.monthAge)TextView monthAge;
 
-    public MoonFragment() {
-        // Required empty public constructor
-    }
+    public MoonFragment() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -93,11 +96,6 @@ public class MoonFragment extends Fragment {
         mListener = null;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
     private void loadMoonRelatedData(AstroCalculator astroCalculator) {
         AstroCalculator.MoonInfo moonInfo = astroCalculator.getMoonInfo();
         try {
@@ -124,18 +122,5 @@ public class MoonFragment extends Fragment {
         SettingsActivity.setSettings("longitude",
                 getString(R.string.pref_default_display_longitude), getContext());
         loadMoonRelatedData(astroCalculator);
-    }
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 }
