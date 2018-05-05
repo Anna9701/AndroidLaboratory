@@ -11,15 +11,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.astrocalculator.AstroCalculator;
-import com.example.anwyr1.astronomicweatherapp.AstronomicCalculator;
+import com.example.anwyr1.astronomicweatherapp.AstronomicCalendarUtil;
 import com.example.anwyr1.astronomicweatherapp.R;
 import com.example.anwyr1.astronomicweatherapp.SettingsActivity;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 import static com.example.anwyr1.astronomicweatherapp.DateUtil.convertAstronomicData;
 
@@ -30,8 +32,6 @@ import static com.example.anwyr1.astronomicweatherapp.DateUtil.convertAstronomic
  * to handle interaction events.
  */
 public class MoonFragment extends Fragment {
-    private static final int MillisecondsInSecond = 1000;
-    private static Timer timer;
     private OnFragmentInteractionListener mListener;
 
     @BindView(R.id.moonRise)TextView moonriseDate;
@@ -63,20 +63,16 @@ public class MoonFragment extends Fragment {
         String syncTimeString = SettingsActivity.getFromSettings("sync_frequency",
                 getString(R.string.pref_default_display_sync_time_value), getContext());
         int time = Integer.parseInt(syncTimeString);
-        time *= MillisecondsInSecond;
-        timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                getActivity().runOnUiThread(new TimerTask() {
-                    @Override
-                    public void run() {
-                        AstronomicCalculator.getInstance(getContext()).updateAstroCalendar(getContext());
-                        loadMoonRelatedData();
-                    }
-                });
-            }
-        }, 0, time);
+        Single<AstroCalculator> astroCalendarObserver = Single.create(emitter -> {
+            AstroCalculator astroCalculator = AstronomicCalendarUtil.createAstroCalculator(getContext());
+            emitter.onSuccess(astroCalculator);
+        });
+        astroCalendarObserver
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .delay(time, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                .repeat()
+                .subscribe(this::loadMoonRelatedData);
     }
 
     @Override
@@ -99,13 +95,11 @@ public class MoonFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        timer.cancel();
         super.onDestroy();
     }
 
-    private void loadMoonRelatedData() {
-        AstronomicCalculator astronomicCalculator = AstronomicCalculator.getInstance(getContext());
-        AstroCalculator.MoonInfo moonInfo = astronomicCalculator.getAstroCalculator().getMoonInfo();
+    private void loadMoonRelatedData(AstroCalculator astroCalculator) {
+        AstroCalculator.MoonInfo moonInfo = astroCalculator.getMoonInfo();
         try {
             moonriseDate.setText(convertAstronomicData(moonInfo.getMoonrise().toString()));
             moonSetDate.setText(convertAstronomicData(moonInfo.getMoonset().toString()));
@@ -120,16 +114,16 @@ public class MoonFragment extends Fragment {
                     "values");
             builder.setPositiveButton(android.R.string.ok, null);
             builder.show();
-            restoreDefaultLatitudeAndLongitude();
+            restoreDefaultLatitudeAndLongitude(astroCalculator);
         }
     }
 
-    private void restoreDefaultLatitudeAndLongitude() {
+    private void restoreDefaultLatitudeAndLongitude(AstroCalculator astroCalculator) {
         SettingsActivity.setSettings("latitude",
                 getString(R.string.pref_default_display_latitude), getContext());
         SettingsActivity.setSettings("longitude",
                 getString(R.string.pref_default_display_longitude), getContext());
-        loadMoonRelatedData();
+        loadMoonRelatedData(astroCalculator);
     }
     /**
      * This interface must be implemented by activities that contain this

@@ -11,21 +11,9 @@ import java.util.Calendar;
  * Created by anwyr1 on 28/04/2018.
  */
 
-public class AstronomicCalculator {
-    private AstroCalculator astroCalculator;
-    private static AstronomicCalculator astronomicCalculator;
+public class AstronomicCalendarUtil {
 
-    private AstronomicCalculator() {}
-
-    public static AstronomicCalculator getInstance(Context context) {
-        if (astronomicCalculator == null) {
-            astronomicCalculator = new AstronomicCalculator();
-            astronomicCalculator.updateAstroCalendar(context);
-        }
-        return astronomicCalculator;
-    }
-
-    public void updateAstroCalendar(Context context) {
+    public static AstroCalculator createAstroCalculator(Context context) {
         String latitude = SettingsActivity.getFromSettings("latitude",
                 context.getString(R.string.pref_default_display_latitude), context);
         String longitude = SettingsActivity.getFromSettings("longitude",
@@ -41,10 +29,6 @@ public class AstronomicCalculator {
         AstroDateTime astroDateTime = new AstroDateTime(year, month, day, hour, minute, second, timezoneOffset, true);
         AstroCalculator.Location location = new AstroCalculator.Location(Double.parseDouble(latitude),
                 Double.parseDouble(longitude));
-        astroCalculator = new AstroCalculator(astroDateTime, location);
-    }
-
-    public AstroCalculator getAstroCalculator() {
-        return astroCalculator;
+        return new AstroCalculator(astroDateTime, location);
     }
 }

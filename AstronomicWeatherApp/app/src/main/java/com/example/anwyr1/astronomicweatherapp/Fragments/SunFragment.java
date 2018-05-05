@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.astrocalculator.AstroCalculator;
-import com.example.anwyr1.astronomicweatherapp.AstronomicCalculator;
+import com.example.anwyr1.astronomicweatherapp.AstronomicCalendarUtil;
 import com.example.anwyr1.astronomicweatherapp.R;
 import com.example.anwyr1.astronomicweatherapp.SettingsActivity;
 
@@ -97,17 +97,16 @@ public class SunFragment extends Fragment {
                 getActivity().runOnUiThread(new TimerTask() {
                     @Override
                     public void run() {
-                        AstronomicCalculator.getInstance(getContext()).updateAstroCalendar(getContext());
-                        loadSunRelatedData();
+                      //  AstronomicCalendarUtil.getInstance(getContext()).updateAstroCalendar(getContext());
+                        loadSunRelatedData(AstronomicCalendarUtil.createAstroCalculator(getContext()));
                     }
                 });}
             }
         }, 0, time);
     }
 
-    private void loadSunRelatedData() {
-        AstronomicCalculator astronomicCalculator = AstronomicCalculator.getInstance(getContext());
-        AstroCalculator.SunInfo sunInfo = astronomicCalculator.getAstroCalculator().getSunInfo();
+    private void loadSunRelatedData(AstroCalculator astroCalculator) {
+        AstroCalculator.SunInfo sunInfo = astroCalculator.getSunInfo();
         sunriseDate.setText(convertAstronomicData(sunInfo.getSunrise().toString()));
         sunriseAzimuth.setText(String.valueOf(sunInfo.getAzimuthRise()));
         sunsetDate.setText(convertAstronomicData(sunInfo.getSunset().toString()));
