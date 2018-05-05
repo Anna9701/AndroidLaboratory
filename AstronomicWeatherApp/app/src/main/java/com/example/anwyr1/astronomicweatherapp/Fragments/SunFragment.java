@@ -86,15 +86,19 @@ public class SunFragment extends Fragment {
         int time = Integer.parseInt(syncTimeString);
 
         Single<AstroCalculator> astroCalendarObserver = Single.create(emitter -> {
-            AstroCalculator astroCalculator = AstronomicCalendarUtil.createAstroCalculator(getContext());
-            emitter.onSuccess(astroCalculator);
+            try {
+                AstroCalculator astroCalculator = AstronomicCalendarUtil.createAstroCalculator(getContext());
+                emitter.onSuccess(astroCalculator);
+            } catch (Exception ex) {
+                emitter.onError(ex);
+            }
         });
         astroCalendarObserver
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .delay(time, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .repeat()
-                .subscribe(this::loadSunRelatedData);
+                .subscribe(this::loadSunRelatedData, System.err::println);
     }
 
     private void loadSunRelatedData(AstroCalculator astroCalculator) {

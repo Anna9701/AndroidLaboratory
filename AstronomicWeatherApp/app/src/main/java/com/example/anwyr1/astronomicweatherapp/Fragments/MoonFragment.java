@@ -67,15 +67,19 @@ public class MoonFragment extends Fragment {
                 getString(R.string.pref_default_display_sync_time_value), getContext());
         int time = Integer.parseInt(syncTimeString);
         Single<AstroCalculator> astroCalendarObserver = Single.create(emitter -> {
-            AstroCalculator astroCalculator = AstronomicCalendarUtil.createAstroCalculator(getContext());
-            emitter.onSuccess(astroCalculator);
+            try {
+                AstroCalculator astroCalculator = AstronomicCalendarUtil.createAstroCalculator(getContext());
+                emitter.onSuccess(astroCalculator);
+            } catch (Exception ex) {
+                emitter.onError(ex);
+            }
         });
         astroCalendarObserver
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .delay(time, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .repeat()
-                .subscribe(this::loadMoonRelatedData);
+                .subscribe(this::loadMoonRelatedData, System.err::println);
     }
 
     @Override
