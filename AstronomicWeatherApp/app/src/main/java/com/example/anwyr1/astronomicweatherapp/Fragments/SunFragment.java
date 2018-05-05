@@ -14,11 +14,13 @@ import com.example.anwyr1.astronomicweatherapp.AstronomicCalendarUtil;
 import com.example.anwyr1.astronomicweatherapp.R;
 import com.example.anwyr1.astronomicweatherapp.SettingsActivity;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 import static com.example.anwyr1.astronomicweatherapp.DateUtil.convertAstronomicData;
 
@@ -30,8 +32,11 @@ import static com.example.anwyr1.astronomicweatherapp.DateUtil.convertAstronomic
  * to handle interaction events.
  */
 public class SunFragment extends Fragment {
-    private static final int MillisecondsInSecond = 1000;
-    private static Timer timer;
+
+    public interface OnFragmentInteractionListener {
+        void onFragmentInteraction(Uri uri);
+    }
+
     private OnFragmentInteractionListener mListener;
 
     @BindView(R.id.sunriseTime) TextView sunriseDate;
@@ -41,9 +46,7 @@ public class SunFragment extends Fragment {
     @BindView(R.id.civilSunrise)TextView civilSunrise;
     @BindView(R.id.civilSunset)TextView civilSunset;
 
-    public SunFragment() {
-        // Required empty public constructor
-    }
+    public SunFragment() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,14 +76,7 @@ public class SunFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        timer.cancel();
         mListener = null;
-    }
-
-    @Override
-    public void onDestroy() {
-        timer.cancel();
-        super.onDestroy();
     }
 
     @Override
@@ -88,21 +84,17 @@ public class SunFragment extends Fragment {
         String syncTimeString = SettingsActivity.getFromSettings("sync_frequency",
                 getString(R.string.pref_default_display_sync_time_value), getContext());
         int time = Integer.parseInt(syncTimeString);
-        time *= MillisecondsInSecond;
-        timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (getActivity() != null) {
-                getActivity().runOnUiThread(new TimerTask() {
-                    @Override
-                    public void run() {
-                      //  AstronomicCalendarUtil.getInstance(getContext()).updateAstroCalendar(getContext());
-                        loadSunRelatedData(AstronomicCalendarUtil.createAstroCalculator(getContext()));
-                    }
-                });}
-            }
-        }, 0, time);
+
+        Single<AstroCalculator> astroCalendarObserver = Single.create(emitter -> {
+            AstroCalculator astroCalculator = AstronomicCalendarUtil.createAstroCalculator(getContext());
+            emitter.onSuccess(astroCalculator);
+        });
+        astroCalendarObserver
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .delay(time, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                .repeat()
+                .subscribe(this::loadSunRelatedData);
     }
 
     private void loadSunRelatedData(AstroCalculator astroCalculator) {
@@ -113,19 +105,5 @@ public class SunFragment extends Fragment {
         sunsetAzimuth.setText(String.valueOf(sunInfo.getAzimuthSet()));
         civilSunrise.setText(convertAstronomicData(sunInfo.getTwilightMorning().toString()));
         civilSunset.setText(convertAstronomicData(sunInfo.getTwilightEvening().toString()));
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 }
