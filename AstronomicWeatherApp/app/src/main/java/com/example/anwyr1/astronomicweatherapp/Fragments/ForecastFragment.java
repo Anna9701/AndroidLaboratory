@@ -28,6 +28,9 @@ import java.net.URL;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 
 /**
@@ -35,11 +38,14 @@ import butterknife.OnClick;
  * Activities that contain this fragment must implement the
  * {@link ForecastFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link ForecastFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
 //TODO check and set correctly display on tablets
 public class ForecastFragment extends Fragment {
+
+    public interface OnFragmentInteractionListener {
+        void onFragmentInteraction(Uri uri);
+    }
+
     private static ForecastData forecastData;
     private static int currentForecastPeriod = 0;
     private OnFragmentInteractionListener mListener;
@@ -63,24 +69,7 @@ public class ForecastFragment extends Fragment {
     @BindView(R.id.forecast_0_precipitation_type)TextView precipitationTypeTextView;
     @BindView(R.id.forecast_no_precipitation)TextView precipitationNullTextView;
 
-    public ForecastFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ForecastFragment.
-     */
-    public static ForecastFragment newInstance(String param1, String param2) {
-        ForecastFragment fragment = new ForecastFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
+    public ForecastFragment() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -134,7 +123,6 @@ public class ForecastFragment extends Fragment {
 
     private void loadXmlFromNetworkAndRefreshData(String urlString) throws XmlPullParserException, IOException {
         InputStream stream = null;
-        // Instantiate the parser
         ForecastXmlParser forecastXmlParser = new ForecastXmlParser();
         try {
             stream = downloadUrl(urlString);
@@ -165,20 +153,27 @@ public class ForecastFragment extends Fragment {
     }
 
     private void displayAlert(final String alertTitle, final String alertMessage) {
-        getActivity().runOnUiThread(new Runnable() {
-            public void run() {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle(alertTitle);
-                builder.setMessage(alertMessage);
-                builder.setPositiveButton(android.R.string.ok, null);
-                AlertDialog alertDialog = builder.create();
-                try {
-                    alertDialog.show();
-                } catch (Exception e) {
-                    alertDialog.dismiss();
-                }
-            }
+        Single<AlertDialog.Builder> alertDialogSingle = Single.create(emitter -> {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle(alertTitle);
+            builder.setMessage(alertMessage);
+            builder.setPositiveButton(android.R.string.ok, null);
+            emitter.onSuccess(builder);
         });
+        alertDialogSingle
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe(builder -> {
+                AlertDialog alertDialog = null;
+                try {
+                    alertDialog = builder.create();
+                    alertDialog.show();
+                } catch (Exception ex) {
+                    if (alertDialog != null) {
+                        alertDialog.dismiss();
+                    }
+                }
+            });
     }
 
     public void refreshCurrentWeather() {
@@ -190,9 +185,7 @@ public class ForecastFragment extends Fragment {
         try {
             loadXmlFromNetworkAndRefreshData(getString(R.string.firstPartOfForecastWeatherApiUrl) + currentCity +
                     getString(R.string.secondPartOfWeatherApiUrl) + units);
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (XmlPullParserException | IOException e) {
             e.printStackTrace();
         }
         updateDataView();
@@ -256,12 +249,6 @@ public class ForecastFragment extends Fragment {
         return conn.getInputStream();
     }
 
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -277,19 +264,5 @@ public class ForecastFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 }

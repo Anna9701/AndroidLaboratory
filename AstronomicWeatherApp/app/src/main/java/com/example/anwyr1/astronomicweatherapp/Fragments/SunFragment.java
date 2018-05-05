@@ -96,6 +96,10 @@ public class SunFragment extends Fragment {
         astroCalendarObserver
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
+                .subscribe(this::loadSunRelatedData, System.err::println);
+        astroCalendarObserver
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
                 .delay(time, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .repeat()
                 .subscribe(this::loadSunRelatedData, System.err::println);

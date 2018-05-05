@@ -81,6 +81,10 @@ public class Main2Activity extends AppCompatActivity
         timeAndLocalizationSubscription
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
+                .subscribe(textToDisplay -> dataHeaderView.setText(textToDisplay));
+        timeAndLocalizationSubscription
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
                 .delay(1, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .repeat()
                 .subscribe(textToDisplay -> dataHeaderView.setText(textToDisplay));

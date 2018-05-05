@@ -77,6 +77,10 @@ public class MoonFragment extends Fragment {
         astroCalendarObserver
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
+                .subscribe(this::loadMoonRelatedData, System.err::println);
+        astroCalendarObserver
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
                 .delay(time, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .repeat()
                 .subscribe(this::loadMoonRelatedData, System.err::println);
