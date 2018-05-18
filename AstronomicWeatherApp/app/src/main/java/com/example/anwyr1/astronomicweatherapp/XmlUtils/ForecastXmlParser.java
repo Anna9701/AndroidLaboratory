@@ -5,6 +5,7 @@ import android.util.Xml;
 import com.example.anwyr1.astronomicweatherapp.Forecast.ForecastData;
 import com.example.anwyr1.astronomicweatherapp.Forecast.ForecastUtils.Clouds;
 import com.example.anwyr1.astronomicweatherapp.Forecast.ForecastUtils.Precipitation;
+import com.example.anwyr1.astronomicweatherapp.Forecast.ForecastUtils.Symbol;
 import com.example.anwyr1.astronomicweatherapp.Forecast.ForecastUtils.Time;
 import com.example.anwyr1.astronomicweatherapp.Forecast.ForecastUtils.Wind;
 import com.example.anwyr1.astronomicweatherapp.Forecast.Location;
@@ -94,13 +95,13 @@ public class ForecastXmlParser extends OpenWeatherApiXmlParser{
         String timeFrom = parser.getAttributeValue(null, "from");
         String timeTo = parser.getAttributeValue(null, "to");
         Time time = new Time(timeFrom, timeTo);
+        Symbol symbol = null;
         Wind wind = null;
         Precipitation precipitation = null;
         Temperature temperature = null;
         Pressure pressure = null;
         Humidity humidity = null;
         Clouds clouds = null;
-        String weatherCondition = null;
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
@@ -109,7 +110,7 @@ public class ForecastXmlParser extends OpenWeatherApiXmlParser{
             // Starts by looking for the entry tag
             switch (name) {
                 case "symbol":
-                    weatherCondition = readWeatherCondition(parser);
+                    symbol = readSymbol(parser);
                     parser.nextTag();
                     break;
                 case "precipitation":
@@ -139,7 +140,11 @@ public class ForecastXmlParser extends OpenWeatherApiXmlParser{
             }
         }
         parser.require(XmlPullParser.END_TAG, ns, "time");
-        return new ThreeHoursForecast(time, wind, temperature, pressure, humidity, clouds, precipitation, weatherCondition);
+        String weatherCondition = null;
+        if (symbol != null) {
+            weatherCondition = symbol.getName();
+        }
+        return new ThreeHoursForecast(time, symbol, wind, temperature, pressure, humidity, clouds, precipitation, weatherCondition);
     }
 
     private Precipitation readPrecipitation(XmlPullParser parser) throws XmlPullParserException, IOException {
@@ -151,9 +156,12 @@ public class ForecastXmlParser extends OpenWeatherApiXmlParser{
         return new Precipitation(value, type);
     }
 
-    private String readWeatherCondition(XmlPullParser parser) throws XmlPullParserException, IOException {
+    private Symbol readSymbol(XmlPullParser parser) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, "symbol");
-        return parser.getAttributeValue(null, "name");
+        String name = parser.getAttributeValue(null, "name");
+        String var = parser.getAttributeValue(null, "var");
+        String number = parser.getAttributeValue(null, "number");
+        return new Symbol(number, name, var);
     }
 
     private Clouds readClouds(XmlPullParser parser) throws XmlPullParserException, IOException {

@@ -184,8 +184,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         private boolean updateLatitudeOrLongitude(Preference preference, String stringValue) {
             if (!NumberUtils.isParsable(stringValue)
-                    || Double.parseDouble(stringValue) <= -90
-                    || Double.parseDouble(stringValue) >= 90) {
+                    || Double.parseDouble(stringValue) <= -80
+                    || Double.parseDouble(stringValue) >= 80) {
                 final String invalidCoordsTitle = "Invalid Input";
                 final String invalidCoordsContent = "Something's gone wrong...";
                 displayAlert(invalidCoordsTitle, invalidCoordsContent, preference.getContext());

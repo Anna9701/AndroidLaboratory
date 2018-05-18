@@ -2,12 +2,17 @@ package com.example.anwyr1.astronomicweatherapp.Fragments;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.anwyr1.astronomicweatherapp.Forecast.ForecastData;
@@ -62,6 +67,7 @@ public class ForecastFragment extends Fragment {
     @BindView(R.id.forecast_0_precipitation_amount)TextView precipitationAmountTextView;
     @BindView(R.id.forecast_0_precipitation_type)TextView precipitationTypeTextView;
     @BindView(R.id.forecast_no_precipitation)TextView precipitationNullTextView;
+    @BindView(R.id.imageView2)ImageView imageView;
 
     public ForecastFragment() {
         // Required empty public constructor
@@ -198,12 +204,38 @@ public class ForecastFragment extends Fragment {
         updateDataView();
     }
 
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+        }
+    }
+
     private void updateDataView() {
         try {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     ThreeHoursForecast forecast = forecastData.getForecastList().get(currentForecastPeriod);
+                    new DownloadImageTask(imageView).execute("https://openweathermap.org/img/w/" + forecast.getSymbol().getVar() + ".png");
                     cityNameTextView.setText(String.format("%s, %s", forecastData.getLocation().getName(),
                             forecastData.getLocation().getCountry()));
                     generalWeatherDescriptionTextView.setText(forecast.getWeatherCondition());

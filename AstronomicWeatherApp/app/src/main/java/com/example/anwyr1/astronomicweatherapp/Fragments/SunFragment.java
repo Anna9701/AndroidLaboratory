@@ -108,6 +108,7 @@ public class SunFragment extends Fragment {
     private void loadSunRelatedData() {
         AstronomicCalculator astronomicCalculator = AstronomicCalculator.getInstance(getContext());
         AstroCalculator.SunInfo sunInfo = astronomicCalculator.getAstroCalculator().getSunInfo();
+        //if(sunInfo.getSunrise() != NAN)
         sunriseDate.setText(convertAstronomicData(sunInfo.getSunrise().toString()));
         sunriseAzimuth.setText(String.valueOf(sunInfo.getAzimuthRise()));
         sunsetDate.setText(convertAstronomicData(sunInfo.getSunset().toString()));

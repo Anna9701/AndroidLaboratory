@@ -2,6 +2,7 @@ package com.example.anwyr1.astronomicweatherapp.Forecast;
 
 import com.example.anwyr1.astronomicweatherapp.Forecast.ForecastUtils.Clouds;
 import com.example.anwyr1.astronomicweatherapp.Forecast.ForecastUtils.Precipitation;
+import com.example.anwyr1.astronomicweatherapp.Forecast.ForecastUtils.Symbol;
 import com.example.anwyr1.astronomicweatherapp.Forecast.ForecastUtils.Time;
 import com.example.anwyr1.astronomicweatherapp.Forecast.ForecastUtils.Wind;
 import com.example.anwyr1.astronomicweatherapp.Weather.CurrentWeatherUtil.Humidity;
@@ -16,6 +17,7 @@ import java.io.Serializable;
 
 public class ThreeHoursForecast implements Serializable{
     private Time time;
+    private Symbol symbol;
     private Wind wind;
     private Temperature temperature;
     private Pressure pressure;
@@ -24,8 +26,9 @@ public class ThreeHoursForecast implements Serializable{
     private Precipitation precipitation;
     private String weatherCondition;
 
-    public ThreeHoursForecast(Time time, Wind wind, Temperature temperature, Pressure pressure, Humidity humidity, Clouds clouds, Precipitation precipitation, String weatherCondition) {
+    public ThreeHoursForecast(Time time, Symbol symbol, Wind wind, Temperature temperature, Pressure pressure, Humidity humidity, Clouds clouds, Precipitation precipitation, String weatherCondition) {
         this.time = time;
+        this.symbol = symbol;
         this.wind = wind;
         this.temperature = temperature;
         this.pressure = pressure;
@@ -97,5 +100,13 @@ public class ThreeHoursForecast implements Serializable{
 
     public void setWeatherCondition(String weatherCondition) {
         this.weatherCondition = weatherCondition;
+    }
+
+    public Symbol getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(Symbol symbol) {
+        this.symbol = symbol;
     }
 }

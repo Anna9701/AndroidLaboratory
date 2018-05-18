@@ -1,6 +1,5 @@
 package com.example.anwyr1.astronomicweatherapp.Fragments;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -107,19 +106,22 @@ public class MoonFragment extends Fragment {
         AstronomicCalculator astronomicCalculator = AstronomicCalculator.getInstance(getContext());
         AstroCalculator.MoonInfo moonInfo = astronomicCalculator.getAstroCalculator().getMoonInfo();
         try {
-            moonriseDate.setText(convertAstronomicData(moonInfo.getMoonrise().toString()));
+            if (moonInfo.getMoonrise() != null)
+                moonriseDate.setText(convertAstronomicData(moonInfo.getMoonrise().toString()));
+            else
+                moonriseDate.setText("No data available");
             moonSetDate.setText(convertAstronomicData(moonInfo.getMoonset().toString()));
             nextNewMoon.setText(convertAstronomicData(moonInfo.getNextNewMoon().toString()));
             nextFullMoon.setText(convertAstronomicData(moonInfo.getNextFullMoon().toString()));
             illumination.setText(String.valueOf(moonInfo.getIllumination()));
             monthAge.setText(String.valueOf(moonInfo.getAge()));
         } catch (NullPointerException ex) {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setTitle("Sync error");
-            builder.setMessage("Something's gone wrong... Restoring default longitude and latitude " +
-                    "values");
-            builder.setPositiveButton(android.R.string.ok, null);
-            builder.show();
+     //       final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+     //       builder.setTitle("Sync error");
+      //      builder.setMessage("Something's gone wrong... Restoring default longitude and latitude " +
+        //            "values");
+       //     builder.setPositiveButton(android.R.string.ok, null);
+//            builder.show();
             restoreDefaultLatitudeAndLongitude();
         }
     }
