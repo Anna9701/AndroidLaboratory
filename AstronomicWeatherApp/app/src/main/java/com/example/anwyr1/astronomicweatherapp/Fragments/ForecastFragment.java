@@ -23,8 +23,6 @@ import com.example.anwyr1.astronomicweatherapp.SettingsActivity;
 import com.example.anwyr1.astronomicweatherapp.XmlUtils.ForecastXmlParser;
 import com.example.anwyr1.astronomicweatherapp.XmlUtils.ObjectSerializerHelper;
 
-import org.xmlpull.v1.XmlPullParserException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -33,6 +31,9 @@ import java.net.URL;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 
 /**
@@ -40,11 +41,14 @@ import butterknife.OnClick;
  * Activities that contain this fragment must implement the
  * {@link ForecastFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link ForecastFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
 //TODO check and set correctly display on tablets
 public class ForecastFragment extends Fragment {
+
+    public interface OnFragmentInteractionListener {
+        void onFragmentInteraction(Uri uri);
+    }
+
     private static ForecastData forecastData;
     private static int currentForecastPeriod = 0;
     private OnFragmentInteractionListener mListener;
@@ -69,24 +73,7 @@ public class ForecastFragment extends Fragment {
     @BindView(R.id.forecast_no_precipitation)TextView precipitationNullTextView;
     @BindView(R.id.imageView2)ImageView imageView;
 
-    public ForecastFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ForecastFragment.
-     */
-    public static ForecastFragment newInstance(String param1, String param2) {
-        ForecastFragment fragment = new ForecastFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
+    public ForecastFragment() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -138,9 +125,9 @@ public class ForecastFragment extends Fragment {
         updateDataView();
     }
 
-    private void loadXmlFromNetworkAndRefreshData(String urlString) throws XmlPullParserException, IOException {
+    private ForecastData loadXmlFromNetworkAndRefreshData(String urlString) {
         InputStream stream = null;
-        // Instantiate the parser
+        ForecastData forecastData = null;
         ForecastXmlParser forecastXmlParser = new ForecastXmlParser();
         try {
             stream = downloadUrl(urlString);
@@ -158,9 +145,15 @@ public class ForecastFragment extends Fragment {
             }
         } finally {
             if (stream != null) {
-                stream.close();
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
+        ForecastFragment.forecastData = forecastData;
+        return forecastData;
     }
 
     private void displayNoForecastAvailableAlert() {
@@ -171,37 +164,45 @@ public class ForecastFragment extends Fragment {
     }
 
     private void displayAlert(final String alertTitle, final String alertMessage) {
-        getActivity().runOnUiThread(new Runnable() {
-            public void run() {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle(alertTitle);
-                builder.setMessage(alertMessage);
-                builder.setPositiveButton(android.R.string.ok, null);
-                AlertDialog alertDialog = builder.create();
-                try {
-                    alertDialog.show();
-                } catch (Exception e) {
-                    alertDialog.dismiss();
-                }
-            }
+        Single<AlertDialog.Builder> alertDialogSingle = Single.create(emitter -> {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle(alertTitle);
+            builder.setMessage(alertMessage);
+            builder.setPositiveButton(android.R.string.ok, null);
+            emitter.onSuccess(builder);
         });
+        alertDialogSingle
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe(builder -> {
+                AlertDialog alertDialog = null;
+                try {
+                    alertDialog = builder.create();
+                    alertDialog.show();
+                } catch (Exception ex) {
+                    if (alertDialog != null) {
+                        alertDialog.dismiss();
+                    }
+                }
+            });
     }
 
     public void refreshCurrentWeather() {
-        String currentCity = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_city_key),
-                getResources().getString(R.string.pref_weather_cities_default_city), getContext());
-        currentCity = currentCity.replaceAll("\\s","");
-        String units = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_units_key),
-                getResources().getString(R.string.pref_default_display_unit_value), getContext());
-        try {
-            loadXmlFromNetworkAndRefreshData(getString(R.string.firstPartOfForecastWeatherApiUrl) + currentCity +
+        Single<ForecastData> forecastDataSingle = Single.create(emitter -> {
+            String currentCity = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_city_key),
+                    getResources().getString(R.string.pref_weather_cities_default_city), getContext());
+            currentCity = currentCity.replaceAll("\\s","");
+            String units = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_units_key),
+                    getResources().getString(R.string.pref_default_display_unit_value), getContext());
+
+            ForecastData forecastData = loadXmlFromNetworkAndRefreshData(getString(R.string.firstPartOfForecastWeatherApiUrl) + currentCity +
                     getString(R.string.secondPartOfWeatherApiUrl) + units);
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        updateDataView();
+            emitter.onSuccess(forecastData);
+        });
+        forecastDataSingle
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe(this::updateDataView);
     }
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
@@ -230,42 +231,41 @@ public class ForecastFragment extends Fragment {
     }
 
     private void updateDataView() {
-        try {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    ThreeHoursForecast forecast = forecastData.getForecastList().get(currentForecastPeriod);
-                    new DownloadImageTask(imageView).execute("https://openweathermap.org/img/w/" + forecast.getSymbol().getVar() + ".png");
-                    cityNameTextView.setText(String.format("%s, %s", forecastData.getLocation().getName(),
-                            forecastData.getLocation().getCountry()));
-                    generalWeatherDescriptionTextView.setText(forecast.getWeatherCondition());
-                    timeFromTextView.setText(forecast.getTime().getFrom());
-                    timeToTextView.setText(forecast.getTime().getTo());
-                    windNameTextView.setText(forecast.getWind().getSpeedName());
-                    windDirectionTextView.setText(forecast.getWind().getDirection());
-                    windSpeedTextView.setText(forecast.getWind().getWindSpeedMps());
-                    tempAvgTextView.setText(forecast.getTemperature().getValue());
-                    tempMaxTextView.setText(forecast.getTemperature().getMax());
-                    tempMinTextView.setText(forecast.getTemperature().getMin());
-                    tempUnitTextView.setText(forecast.getTemperature().getUnit());
-                    humidityTextView.setText(String.format("%s %s", forecast.getHumidity().getValue(), forecast.getHumidity().getUnit()));
-                    pressureTextView.setText(String.format("%s %s", forecast.getPressure().getValue(), forecast.getPressure().getUnit()));
-                    cloudsDescTextView.setText(forecast.getClouds().getValue());
-                    cloudsAllValueTextView.setText(String.format("Cloudiness: %s%s", forecast.getClouds().getAll(), forecast.getClouds().getUnit()));
-                    Precipitation precipitation = forecast.getPrecipitation();
-                    if (precipitation != null) {
-                        precipitationAmountTextView.setText(precipitation.getValue());
-                        precipitationTypeTextView.setText(precipitation.getType());
-                        precipitationNullTextView.setText("");
-                    } else {
-                        precipitationTypeTextView.setText("");
-                        precipitationAmountTextView.setText("");
-                        precipitationNullTextView.setText(R.string.NullPrecipitationDescription);
-                    }
-                }
-            });
-        } catch (NullPointerException ex) {
-            ex.printStackTrace();
+       Single<ForecastData> forecastDataSingle = Single.just(forecastData);
+        forecastDataSingle
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe(this::updateDataView);
+    }
+
+    private void updateDataView(ForecastData forecastData) {
+        ThreeHoursForecast forecast = forecastData.getForecastList().get(currentForecastPeriod);
+        new DownloadImageTask(imageView).execute("https://openweathermap.org/img/w/" + forecast.getSymbol().getVar() + ".png");
+        cityNameTextView.setText(String.format("%s, %s", forecastData.getLocation().getName(),
+                forecastData.getLocation().getCountry()));
+        generalWeatherDescriptionTextView.setText(forecast.getWeatherCondition());
+        timeFromTextView.setText(forecast.getTime().getFrom());
+        timeToTextView.setText(forecast.getTime().getTo());
+        windNameTextView.setText(forecast.getWind().getSpeedName());
+        windDirectionTextView.setText(forecast.getWind().getDirection());
+        windSpeedTextView.setText(forecast.getWind().getWindSpeedMps());
+        tempAvgTextView.setText(forecast.getTemperature().getValue());
+        tempMaxTextView.setText(forecast.getTemperature().getMax());
+        tempMinTextView.setText(forecast.getTemperature().getMin());
+        tempUnitTextView.setText(forecast.getTemperature().getUnit());
+        humidityTextView.setText(String.format("%s %s", forecast.getHumidity().getValue(), forecast.getHumidity().getUnit()));
+        pressureTextView.setText(String.format("%s %s", forecast.getPressure().getValue(), forecast.getPressure().getUnit()));
+        cloudsDescTextView.setText(forecast.getClouds().getValue());
+        cloudsAllValueTextView.setText(String.format("Cloudiness: %s%s", forecast.getClouds().getAll(), forecast.getClouds().getUnit()));
+        Precipitation precipitation = forecast.getPrecipitation();
+        if (precipitation != null) {
+            precipitationAmountTextView.setText(precipitation.getValue());
+            precipitationTypeTextView.setText(precipitation.getType());
+            precipitationNullTextView.setText("");
+        } else {
+            precipitationTypeTextView.setText("");
+            precipitationAmountTextView.setText("");
+            precipitationNullTextView.setText(R.string.NullPrecipitationDescription);
         }
     }
 
@@ -283,15 +283,8 @@ public class ForecastFragment extends Fragment {
         conn.setConnectTimeout(15000 /* milliseconds */);
         conn.setRequestMethod("GET");
         conn.setDoInput(true);
-        // Starts the query
         conn.connect();
         return conn.getInputStream();
-    }
-
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
@@ -309,19 +302,5 @@ public class ForecastFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 }

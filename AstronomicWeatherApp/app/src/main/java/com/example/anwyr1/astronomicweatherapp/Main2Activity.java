@@ -20,11 +20,14 @@ import com.example.anwyr1.astronomicweatherapp.Fragments.ForecastFragment;
 import com.example.anwyr1.astronomicweatherapp.Fragments.MoonFragment;
 import com.example.anwyr1.astronomicweatherapp.Fragments.SunFragment;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -57,31 +60,34 @@ public class Main2Activity extends AppCompatActivity
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
-        setupCurrentTimeAndLocalization();
+        setupCurrentTimeAndLocalizationObservable();
         actualWeatherFragment = ((ActualWeatherFragment) getSupportFragmentManager().findFragmentById(R.id.fragment4b));
         forecastFragment = ((ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment3b));
         if (mode.equals(weatherMode))
             setWeatherMode();
     }
 
-    private void setupCurrentTimeAndLocalization() {
+    private void setupCurrentTimeAndLocalizationObservable() {
         final Context context = this;
-        new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                runOnUiThread(new TimerTask() {
-                    @Override
-                    public void run() {
-                        String latitude = SettingsActivity.getFromSettings("latitude",
-                                getString(R.string.pref_default_display_latitude), context);
-                        String longitude = SettingsActivity.getFromSettings("longitude",
-                                getString(R.string.pref_default_display_longitude), context);
-                        dataHeaderView.setText(String.format("%s, %s \n%s", latitude, longitude,
-                                DateUtil.getCurrentDate()));
-                    }
-                });
-            }
-        }, 0, 1000);
+        final Observable<String> timeAndLocalizationSubscription = Observable.create(emitter -> {
+            String latitude = SettingsActivity.getFromSettings("latitude",
+                    getString(R.string.pref_default_display_latitude), context);
+            String longitude = SettingsActivity.getFromSettings("longitude",
+                    getString(R.string.pref_default_display_longitude), context);
+            String datetime = DateUtil.getCurrentDate();
+            emitter.onNext(String.format("%s, %s \n%s", latitude, longitude, datetime));
+            emitter.onComplete();
+        });
+        timeAndLocalizationSubscription
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(textToDisplay -> dataHeaderView.setText(textToDisplay));
+        timeAndLocalizationSubscription
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .delay(1, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                .repeat()
+                .subscribe(textToDisplay -> dataHeaderView.setText(textToDisplay));
     }
 
     @Override
@@ -105,23 +111,17 @@ public class Main2Activity extends AppCompatActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-        } else if (id == R.id.action_updateWeatherData) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
+        Single<Integer> observer = Single.just(item.getItemId());
+        observer
+                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .subscribe(itemId -> {
+                    if (itemId == R.id.action_settings)
+                        startActivity(new Intent(this, SettingsActivity.class));
+                    else if (itemId == R.id.action_updateWeatherData)
                         refreshWeather();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-        }
+                }, System.err::println);
+
         return super.onOptionsItemSelected(item);
     }
 

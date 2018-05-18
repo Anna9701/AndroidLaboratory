@@ -25,13 +25,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
-        <TextView
+            <TextView
                 android:id="@+id/sunriseTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
                 android:textAlignment="textEnd"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                tools:text="@string/Loading_default_text" />
 
         </TableRow>
 
@@ -51,13 +51,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
-        <TextView
+            <TextView
                 android:id="@+id/sunriseAzimuth"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
                 android:textAlignment="textEnd"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                tools:text="@string/Loading_default_text" />
         </TableRow>
 
         <TableRow
@@ -77,13 +77,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
-        <TextView
+            <TextView
                 android:id="@+id/sunsetTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
                 android:textAlignment="textEnd"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                tools:text="@string/Loading_default_text" />
         </TableRow>
 
         <TableRow
@@ -103,13 +103,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
-        <TextView
+            <TextView
                 android:id="@+id/sunsetAzimuth"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
                 android:textAlignment="textEnd"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                tools:text="@string/Loading_default_text" />
         </TableRow>
 
         <TableRow
@@ -129,13 +129,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
-        <TextView
+            <TextView
                 android:id="@+id/civilSunrise"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
                 android:textAlignment="textEnd"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                tools:text="@string/Loading_default_text" />
 
         </TableRow>
 
@@ -162,9 +162,9 @@
                 android:id="@+id/civilSunset"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
                 android:textAlignment="textEnd"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                tools:text="@string/Loading_default_text" />
         </TableRow>
 
     </TableLayout>

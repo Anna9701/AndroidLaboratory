@@ -130,4 +130,5 @@
     <string name="secondPartOfWeatherApiUrl"><![CDATA[&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=]]></string>
     <string name="firstPartOfWeatherWeatherApiUrl">http://api.openweathermap.org/data/2.5/weather?q=</string>
     <string name="currentForecastPeriodKey">currentForecastPeriodKey</string>
+    <string name="Loading_default_text">Loading...</string>
 </resources>
