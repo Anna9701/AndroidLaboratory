@@ -131,4 +131,6 @@
     <string name="firstPartOfWeatherWeatherApiUrl">http://api.openweathermap.org/data/2.5/weather?q=</string>
     <string name="currentForecastPeriodKey">currentForecastPeriodKey</string>
     <string name="Loading_default_text">Loading...</string>
+    <string name="openweatherapiforecasticonfirstpart">https://openweathermap.org/img/w/</string>
+    <string name="iconExtension">.png</string>
 </resources>

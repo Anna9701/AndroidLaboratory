@@ -240,7 +240,10 @@ public class ForecastFragment extends Fragment {
 
     private void updateDataView(ForecastData forecastData) {
         ThreeHoursForecast forecast = forecastData.getForecastList().get(currentForecastPeriod);
-        new DownloadImageTask(imageView).execute("https://openweathermap.org/img/w/" + forecast.getSymbol().getVar() + ".png");
+        new DownloadImageTask(imageView).execute(String.format("%s%s%s",
+                getString(R.string.openweatherapiforecasticonfirstpart),
+                forecast.getSymbol().getVar(),
+                getString(R.string.iconExtension)));
         cityNameTextView.setText(String.format("%s, %s", forecastData.getLocation().getName(),
                 forecastData.getLocation().getCountry()));
         generalWeatherDescriptionTextView.setText(forecast.getWeatherCondition());
