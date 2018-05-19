@@ -59,9 +59,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static final String defaultCity = "Lodz, PL";
     private static final String spaceReplacement = "%20";
     private static final String spacePattern = "\\s";
-
-
-
+    private static final String firstPartOpenWeatherApiForCityNameUrl = "http://api.openweathermap.org/data/2.5/weather?q=";
+    private static final String firstPartOpenWeatherApiForCoordsUrl = "http://api.openweathermap.org/data/2.5/weather?lat=";
+    private static final String openWeatherApiLongitudePartUrl = "&lon=";
+    private static final String secondPartOpenWeatherApiUrl = "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=";
 
     public static boolean isCityByNameEnabled(final Context context) {
         return getBoolFromSettings(astroweatherSourceKey, true, context);
@@ -87,8 +88,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static void updateLatitudeAmdLongitude(final String city, final Context context) {
         Single<CurrentWeather> currentWeatherSingle = Single.create(emitter -> {
             String searchCity  = city.replaceAll(spacePattern,spaceReplacement);
-            CurrentWeather currentWeather = loadXmlFromNetworkAndRefreshData("http://api.openweathermap.org/data/2.5/weather?q="
-                    + searchCity + "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=");
+            CurrentWeather currentWeather = loadCurrentWeatherData(String.format("%s%s%s",
+                    firstPartOpenWeatherApiForCityNameUrl, searchCity, secondPartOpenWeatherApiUrl));
             emitter.onSuccess(currentWeather);
         });
         currentWeatherSingle
@@ -104,8 +105,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         Single<CurrentWeather> currentWeatherSingle = Single.create(emitter -> {
             String latitude = getFromSettings(latitudeKey, defaultCity, context);
             String longitude = getFromSettings(longitudeKey, defaultCity, context);
-            CurrentWeather currentWeather = loadXmlFromNetworkAndRefreshData("http://api.openweathermap.org/data/2.5/weather?lat="
-                    + latitude + "&lon=" + longitude + "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=");
+            CurrentWeather currentWeather = loadCurrentWeatherData(String.format("%s%s%s%s%s",
+                    firstPartOpenWeatherApiForCoordsUrl, latitude,
+                    openWeatherApiLongitudePartUrl, longitude,
+                    secondPartOpenWeatherApiUrl));
             emitter.onSuccess(currentWeather);
         });
         currentWeatherSingle
@@ -118,7 +121,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 });
     }
 
-    private static CurrentWeather loadXmlFromNetworkAndRefreshData(final String urlString) {
+    private static CurrentWeather loadCurrentWeatherData(final String urlString) {
         try {
             return new ActualWeatherXmlParser().parse(downloadUrl(urlString));
         } catch (Exception ex) {
@@ -143,8 +146,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * to reflect its new value.
      */
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
-        final String invalidCityTitle = "Invalid City Selected";
-        final String invalidCityContent = "Something's gone wrong... There is no such city or you have no access to Internet.";
+        private final String invalidCityTitle = "Invalid City Selected";
+        private final String invalidCityContent = "Something's gone wrong... There is no such city or you have no access to Internet.";
+        private final String invalidCoordsTitle = "Invalid Input";
+        private final String invalidCoordsContent = "Something's gone wrong...";
+        private final String astroWeatherByCityNameTitle = "Astroweather by City Name Enabled";
+        private final String astroWeatherByCityNameContent = "Disable it to set custom coordinates";
 
         @Override
         public boolean onPreferenceChange(final Preference preference, final Object value) {
@@ -234,12 +241,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         private boolean isCityValid(final String cityId) {
             if(!cityId.matches("[A-Za-z].*,*[A-Za-z].*"))
                 return false;
-            final String firstUrlWeatherApiPart = "http://api.openweathermap.org/data/2.5/weather?q=";
-            final String secondUrlWeatherApiPart = "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=";
             ExecutorService es = Executors.newSingleThreadExecutor();
             Future<Boolean> result = es.submit(() -> {
                 try {
-                    downloadUrl(firstUrlWeatherApiPart + cityId + secondUrlWeatherApiPart);
+                    downloadUrl(firstPartOpenWeatherApiForCityNameUrl + cityId + secondPartOpenWeatherApiUrl);
                 } catch (IOException e) {
                     return false;
                 }
@@ -258,16 +263,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         private boolean updateLatitudeOrLongitude(final Preference preference, final String stringValue) {
             if (isCityByNameEnabled(preference.getContext())) {
-                final String astroWeatherByCityNameTitle = "Astroweather by City Name Enabled";
-                final String astroWeatherByCityNameContent = "Disable it to set custom coordinates";
                 displayAlert(astroWeatherByCityNameTitle, astroWeatherByCityNameContent, preference.getContext());
                 return false;
             }
             if (!NumberUtils.isParsable(stringValue)
                     || Double.parseDouble(stringValue) <= -80
                     || Double.parseDouble(stringValue) >= 80) {
-                final String invalidCoordsTitle = "Invalid Input";
-                final String invalidCoordsContent = "Something's gone wrong...";
                 displayAlert(invalidCoordsTitle, invalidCoordsContent, preference.getContext());
                 return false;
             }
@@ -276,14 +277,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             try {
                 if(!result.get()) {
                     es.shutdown();
-                    final String invalidCoordsTitle = "Invalid Input";
-                    final String invalidCoordsContent = "Something's gone wrong...";
                     displayAlert(invalidCoordsTitle, invalidCoordsContent, preference.getContext());
                     return false;
                 }
             } catch (Exception e) {
-                final String invalidCoordsTitle = "Invalid Input";
-                final String invalidCoordsContent = "Something's gone wrong...";
                 displayAlert(invalidCoordsTitle, invalidCoordsContent, preference.getContext());
                 return false;
             }
@@ -301,7 +298,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     };
 
-    private static boolean isLatitudeAndLongitudeValid(Preference preference, String stringValue) {
+    private static boolean isLatitudeAndLongitudeValid(final Preference preference, final String stringValue) {
         String latitude;
         String longitude;
         if (preference.getKey().equals(latitudeKey)) {
@@ -311,8 +308,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             latitude = getFromSettings(latitudeKey, "0", preference.getContext());
             longitude = stringValue;
         }
-        CurrentWeather currentWeather = loadXmlFromNetworkAndRefreshData("http://api.openweathermap.org/data/2.5/weather?lat="
-                + latitude + "&lon=" + longitude + "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=");
+        CurrentWeather currentWeather = loadCurrentWeatherData(String.format("%s%s%s%s%s",
+                firstPartOpenWeatherApiForCoordsUrl, latitude,
+                openWeatherApiLongitudePartUrl, longitude,
+                secondPartOpenWeatherApiUrl));
         return (currentWeather != null ? currentWeather.getCity().getName().length() : 0) != 0;
     }
 
