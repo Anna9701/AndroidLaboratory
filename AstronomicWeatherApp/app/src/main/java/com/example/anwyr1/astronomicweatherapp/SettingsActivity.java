@@ -52,31 +52,41 @@ import io.reactivex.schedulers.Schedulers;
 public class SettingsActivity extends AppCompatPreferenceActivity {
     private static String city1, city2, city3, city4, city5;
     private static ListPreference listPreference;
+    private static final String latitudeKey = "latitude";
+    private static final String longitudeKey = "longitude";
+    private static final String selectedCityKey = "selected_city";
+    private static final String astroweatherSourceKey = "astroweatherSource";
+    private static final String defaultCity = "Lodz, PL";
+    private static final String spaceReplacement = "%20";
+    private static final String spacePattern = "\\s";
 
-    public static boolean isCityByNameEnabled(Context context) {
-        return getBoolFromSettings("astroweatherSource", true, context);
+
+
+
+    public static boolean isCityByNameEnabled(final Context context) {
+        return getBoolFromSettings(astroweatherSourceKey, true, context);
     }
 
-    public static String getFromSettings(String key, String defValue, Context context) {
+    public static String getFromSettings(final String key, final String defValue, final Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         return preferences.getString(key, defValue);
     }
 
-    public static Boolean getBoolFromSettings(String key, boolean defValue, Context context) {
+    public static Boolean getBoolFromSettings(final String key, final boolean defValue, final Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         return preferences.getBoolean(key, defValue);
     }
 
-    public static void setSettings(String key, String value, Context context) {
+    public static void setSettings(final String key, final String value, final Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(key, value);
         editor.apply();
     }
 
-    private static void updateLatitudeAmdLongitude(String city, Context context) {
+    private static void updateLatitudeAmdLongitude(final String city, final Context context) {
         Single<CurrentWeather> currentWeatherSingle = Single.create(emitter -> {
-            String searchCity  = city.replaceAll("\\s","%20");
+            String searchCity  = city.replaceAll(spacePattern,spaceReplacement);
             CurrentWeather currentWeather = loadXmlFromNetworkAndRefreshData("http://api.openweathermap.org/data/2.5/weather?q="
                     + searchCity + "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=");
             emitter.onSuccess(currentWeather);
@@ -85,15 +95,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(currentWeather -> {
-                    setSettings("latitude", currentWeather.getCity().getCoord().getLatitude(), context);
-                    setSettings("longitude", currentWeather.getCity().getCoord().getLongitude(), context);
+                    setSettings(latitudeKey, currentWeather.getCity().getCoord().getLatitude(), context);
+                    setSettings(longitudeKey, currentWeather.getCity().getCoord().getLongitude(), context);
                 });
     }
 
-    private static void updateSelectedCity(Context context) {
+    private static void updateSelectedCity(final Context context) {
         Single<CurrentWeather> currentWeatherSingle = Single.create(emitter -> {
-            String latitude = getFromSettings("latitude", "Lodz, PL", context);
-            String longitude = getFromSettings("longitude", "Lodz, PL", context);
+            String latitude = getFromSettings(latitudeKey, defaultCity, context);
+            String longitude = getFromSettings(longitudeKey, defaultCity, context);
             CurrentWeather currentWeather = loadXmlFromNetworkAndRefreshData("http://api.openweathermap.org/data/2.5/weather?lat="
                     + latitude + "&lon=" + longitude + "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=");
             emitter.onSuccess(currentWeather);
@@ -102,13 +112,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(currentWeather -> {
-                    setSettings("selected_city", String.format("%s, %s",
+                    setSettings(selectedCityKey, String.format("%s, %s",
                             currentWeather.getCity().getName(),
                             currentWeather.getCity().getCountry().getCountryCode()) , context);
                 });
     }
 
-    private static CurrentWeather loadXmlFromNetworkAndRefreshData(String urlString) {
+    private static CurrentWeather loadXmlFromNetworkAndRefreshData(final String urlString) {
         try {
             return new ActualWeatherXmlParser().parse(downloadUrl(urlString));
         } catch (Exception ex) {
@@ -117,7 +127,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         return null;
     }
 
-    private static InputStream downloadUrl(String urlString) throws IOException {
+    private static InputStream downloadUrl(final String urlString) throws IOException {
         URL url = new URL(urlString);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setReadTimeout(1000 /* milliseconds */);
@@ -137,12 +147,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         final String invalidCityContent = "Something's gone wrong... There is no such city or you have no access to Internet.";
 
         @Override
-        public boolean onPreferenceChange(final Preference preference, Object value) {
+        public boolean onPreferenceChange(final Preference preference, final Object value) {
             final String stringValue = value.toString();
 
             if (preference instanceof SwitchPreference) {
                 if (value instanceof Boolean && (Boolean)value) {
-                    String city = getFromSettings("selected_city","Lodz, PL", preference.getContext());
+                    String city = getFromSettings(selectedCityKey,defaultCity, preference.getContext());
                     updateLatitudeAmdLongitude(city, preference.getContext());
                 }
             } else if (preference instanceof ListPreference) {
@@ -152,8 +162,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         index >= 0
                                 ? listPreference.getEntries()[index]
                                 : null);
-                if (preference.getKey().equals("selected_city")) {
-                    if (!isCityByNameEnabled(preference.getContext())) return false;
+                if (preference.getKey().equals(selectedCityKey)) {
                     if(isCityValid(stringValue)) {
                         if (isCityByNameEnabled(preference.getContext())) {
                             updateLatitudeAmdLongitude(stringValue, preference.getContext());
@@ -162,8 +171,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     }
                     return false;
                 }
-            } else if (preference instanceof EditTextPreference && (preference.getKey().equals("latitude")
-                    || preference.getKey().equals("longitude"))) {
+            } else if (preference instanceof EditTextPreference && (preference.getKey().equals(latitudeKey)
+                    || preference.getKey().equals(longitudeKey))) {
                 if (!updateLatitudeOrLongitude(preference, stringValue))
                     return false;
                 updateSelectedCity(preference.getContext());
@@ -178,7 +187,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return true;
         }
 
-        private boolean updateProperFavoriteCity(Preference preference, String stringValue) {
+        private boolean updateProperFavoriteCity(final Preference preference, final String stringValue) {
             int numberOfCity;
             final int numberOfCities = 5;
             String key = preference.getKey();
@@ -215,10 +224,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return true;
         }
 
-        private boolean isCityValid(String city, int numberOfCity) {
+        private boolean isCityValid(final String city, final int numberOfCity) {
             if (city.length() == 0 && numberOfCity > 0)
                 return true;
-            final String cityId = city.replaceAll("\\s","");
+            final String cityId = city.replaceAll(spacePattern, spaceReplacement);
             return isCityValid(cityId);
         }
 
@@ -247,7 +256,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return true;
         }
 
-        private boolean updateLatitudeOrLongitude(Preference preference, String stringValue) {
+        private boolean updateLatitudeOrLongitude(final Preference preference, final String stringValue) {
             if (isCityByNameEnabled(preference.getContext())) {
                 final String astroWeatherByCityNameTitle = "Astroweather by City Name Enabled";
                 final String astroWeatherByCityNameContent = "Disable it to set custom coordinates";
@@ -257,6 +266,22 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             if (!NumberUtils.isParsable(stringValue)
                     || Double.parseDouble(stringValue) <= -80
                     || Double.parseDouble(stringValue) >= 80) {
+                final String invalidCoordsTitle = "Invalid Input";
+                final String invalidCoordsContent = "Something's gone wrong...";
+                displayAlert(invalidCoordsTitle, invalidCoordsContent, preference.getContext());
+                return false;
+            }
+            ExecutorService es = Executors.newSingleThreadExecutor();
+            Future<Boolean> result = es.submit(() -> isLatitudeAndLongitudeValid(preference, stringValue));
+            try {
+                if(!result.get()) {
+                    es.shutdown();
+                    final String invalidCoordsTitle = "Invalid Input";
+                    final String invalidCoordsContent = "Something's gone wrong...";
+                    displayAlert(invalidCoordsTitle, invalidCoordsContent, preference.getContext());
+                    return false;
+                }
+            } catch (Exception e) {
                 final String invalidCoordsTitle = "Invalid Input";
                 final String invalidCoordsContent = "Something's gone wrong...";
                 displayAlert(invalidCoordsTitle, invalidCoordsContent, preference.getContext());
@@ -276,16 +301,31 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     };
 
+    private static boolean isLatitudeAndLongitudeValid(Preference preference, String stringValue) {
+        String latitude;
+        String longitude;
+        if (preference.getKey().equals(latitudeKey)) {
+            latitude = stringValue;
+            longitude = getFromSettings(longitudeKey, "0", preference.getContext());
+        } else {
+            latitude = getFromSettings(latitudeKey, "0", preference.getContext());
+            longitude = stringValue;
+        }
+        CurrentWeather currentWeather = loadXmlFromNetworkAndRefreshData("http://api.openweathermap.org/data/2.5/weather?lat="
+                + latitude + "&lon=" + longitude + "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=");
+        return (currentWeather != null ? currentWeather.getCity().getName().length() : 0) != 0;
+    }
+
     /**
      * Helper method to determine if the device has an extra-large screen. For
      * example, 10" tablets are extra-large.
      */
-    private static boolean isXLargeTablet(Context context) {
+    private static boolean isXLargeTablet(final Context context) {
         return (context.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 
-    private static void bindPreferenceSummaryToValue(Preference preference) {
+    private static void bindPreferenceSummaryToValue(final Preference preference) {
 
         preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
         if (preference instanceof SwitchPreference) {
@@ -298,7 +338,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
         city1 = getFromSettings(getResources().getString(R.string.city1_key),
@@ -325,7 +365,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     }
 
     @Override
-    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+    public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
             if (!super.onMenuItemSelected(featureId, item)) {
@@ -349,7 +389,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     @Override
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public void onBuildHeaders(List<Header> target) {
+    public void onBuildHeaders(final List<Header> target) {
         loadHeadersFromResource(R.xml.pref_headers, target);
     }
 
@@ -357,7 +397,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * This method stops fragment injection in malicious applications.
      * Make sure to deny any unknown fragments here.
      */
-    protected boolean isValidFragment(String fragmentName) {
+    protected boolean isValidFragment(final String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
                 || GeneralPreferenceFragment.class.getName().equals(fragmentName)
                 || DataSyncPreferenceFragment.class.getName().equals(fragmentName)
@@ -369,7 +409,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static class GeneralPreferenceFragment extends PreferenceFragment {
 
         @Override
-        public void onCreate(Bundle savedInstanceState) {
+        public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_general);
             setHasOptionsMenu(true);
@@ -379,7 +419,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
 
         @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
+        public boolean onOptionsItemSelected(final MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
                 startActivity(new Intent(getActivity(), SettingsActivity.class));
@@ -393,7 +433,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static class NotificationPreferenceFragment extends PreferenceFragment {
 
         @Override
-        public void onCreate(Bundle savedInstanceState) {
+        public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_weather);
             setHasOptionsMenu(true);
@@ -424,7 +464,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
 
         @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
+        public boolean onOptionsItemSelected(final MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
                 startActivity(new Intent(getActivity(), SettingsActivity.class));
@@ -441,7 +481,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class DataSyncPreferenceFragment extends PreferenceFragment {
         @Override
-        public void onCreate(Bundle savedInstanceState) {
+        public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_data_sync);
             setHasOptionsMenu(true);
@@ -450,7 +490,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
 
         @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
+        public boolean onOptionsItemSelected(final MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
                 startActivity(new Intent(getActivity(), SettingsActivity.class));
