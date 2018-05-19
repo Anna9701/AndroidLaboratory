@@ -133,4 +133,5 @@
     <string name="Loading_default_text">Loading...</string>
     <string name="openweatherapiforecasticonfirstpart">https://openweathermap.org/img/w/</string>
     <string name="iconExtension">.png</string>
+    <string name="astroweatherSource">astroweatherSource</string>
 </resources>

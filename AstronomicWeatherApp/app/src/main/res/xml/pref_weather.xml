@@ -11,6 +11,12 @@
         android:entryValues="@array/list_preference_units_values"
         android:key="@string/weather_units_key"
         android:title="@string/wether_unit_name" />
+    <SwitchPreference
+        android:defaultValue="true"
+        android:dependency="@string/weather_city_key"
+        android:disableDependentsState="false"
+        android:key="@string/astroweatherSource"
+        android:title="Astro Weather By City Name" />
     <PreferenceCategory android:title="@string/pref_weather_cities_list_header">
 
         <ListPreference

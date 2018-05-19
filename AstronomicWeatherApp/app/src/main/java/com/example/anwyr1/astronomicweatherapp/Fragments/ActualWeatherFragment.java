@@ -9,8 +9,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.anwyr1.astronomicweatherapp.DownloadImageTask;
 import com.example.anwyr1.astronomicweatherapp.R;
 import com.example.anwyr1.astronomicweatherapp.SettingsActivity;
 import com.example.anwyr1.astronomicweatherapp.Weather.CurrentWeather;
@@ -56,6 +58,7 @@ public class ActualWeatherFragment extends Fragment {
     @BindView(R.id.currentWeather_wind_name)TextView windNameTextView;
     @BindView(R.id.currentWeather_wind_direction)TextView windDirectionTextView;
     @BindView(R.id.currentWeather_wind_speed)TextView windSpeedTextView;
+    @BindView(R.id.textView3)ImageView imageView;
 
     public ActualWeatherFragment() { }
 
@@ -78,6 +81,10 @@ public class ActualWeatherFragment extends Fragment {
     }
 
     private void setCurrentWeatherView(final CurrentWeather currentWeather) {
+        new DownloadImageTask(imageView).execute(String.format("%s%s%s",
+                getString(R.string.openweatherapiforecasticonfirstpart),
+                currentWeather.getWeather().getIcon(),
+                getString(R.string.iconExtension)));
         placeTextView.setText(String.format("%s, %s", currentWeather.getCity().getName(), currentWeather.getCity().getCountry().getCountryCode()));
         sunriseTextView.setText(currentWeather.getCity().getSun().getRise());
         sunsetTextView.setText(currentWeather.getCity().getSun().getSet());

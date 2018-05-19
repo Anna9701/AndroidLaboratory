@@ -14,9 +14,13 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
+
+import com.example.anwyr1.astronomicweatherapp.Weather.CurrentWeather;
+import com.example.anwyr1.astronomicweatherapp.XmlUtils.ActualWeatherXmlParser;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -26,10 +30,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -45,9 +52,18 @@ import java.util.concurrent.Future;
 public class SettingsActivity extends AppCompatPreferenceActivity {
     private static String city1, city2, city3, city4, city5;
 
-    public static String getFromSettings(String key, String defValue,  Context context) {
+    public static boolean isCityByNameEnabled(Context context) {
+        return getBoolFromSettings("astroweatherSource", true, context);
+    }
+
+    public static String getFromSettings(String key, String defValue, Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         return preferences.getString(key, defValue);
+    }
+
+    public static Boolean getBoolFromSettings(String key, boolean defValue, Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getBoolean(key, defValue);
     }
 
     public static void setSettings(String key, String value, Context context) {
@@ -56,6 +72,48 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         editor.putString(key, value);
         editor.apply();
     }
+
+    private static void updateLatitudeAmdLongitude(String city, Context context) {
+        Single<CurrentWeather> currentWeatherSingle = Single.create(emitter -> {
+            String searchCity = city.replaceAll(" ", "");
+            CurrentWeather currentWeather = loadXmlFromNetworkAndRefreshData("http://api.openweathermap.org/data/2.5/weather?q="
+                    + searchCity + "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=");
+            emitter.onSuccess(currentWeather);
+        });
+        currentWeatherSingle
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(currentWeather -> {
+                    setSettings("latitude", currentWeather.getCity().getCoord().getLatitude(), context);
+                    setSettings("longitude", currentWeather.getCity().getCoord().getLongitude(), context);
+                });
+    }
+
+    private static CurrentWeather loadXmlFromNetworkAndRefreshData(String urlString) {
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(urlString);
+            conn = (HttpURLConnection) url.openConnection();
+            conn .setReadTimeout(10000);
+            conn.setConnectTimeout(15000);
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+            conn.connect();
+            return new ActualWeatherXmlParser().parse(conn.getInputStream());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                if (conn.getInputStream() != null) {
+                    conn.getInputStream().close();
+                }
+            } catch (Exception e) {
+                    e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -68,7 +126,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public boolean onPreferenceChange(final Preference preference, Object value) {
             final String stringValue = value.toString();
 
-            if (preference instanceof ListPreference) {
+            if (preference instanceof SwitchPreference) {
+                if (value instanceof Boolean && (Boolean)value) {
+                    String city = getFromSettings("selected_city","Lodz, PL", preference.getContext());
+                    updateLatitudeAmdLongitude(city, preference.getContext());
+                }
+            } else if (preference instanceof ListPreference) {
                 final ListPreference listPreference = (ListPreference) preference;
                 int index = listPreference.findIndexOfValue(stringValue);
                 preference.setSummary(
@@ -76,7 +139,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                 ? listPreference.getEntries()[index]
                                 : null);
                 if (preference.getKey().equals("selected_city")) {
-                    return isCityValid(stringValue);
+                    if(isCityValid(stringValue)) {
+                        if (isCityByNameEnabled(preference.getContext())) {
+                            updateLatitudeAmdLongitude(stringValue, preference.getContext());
+                        }
+                        return true;
+                    }
+                    return false;
                 }
             } else if (preference instanceof EditTextPreference && (preference.getKey().equals("latitude")
                     || preference.getKey().equals("longitude"))) {
@@ -143,15 +212,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             final String firstUrlWeatherApiPart = "http://api.openweathermap.org/data/2.5/weather?q=";
             final String secondUrlWeatherApiPart = "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=";
             ExecutorService es = Executors.newSingleThreadExecutor();
-            Future<Boolean> result = es.submit(new Callable<Boolean>() {
-                public Boolean call() throws Exception {
-                    try {
-                        downloadUrl(firstUrlWeatherApiPart + cityId + secondUrlWeatherApiPart);
-                    } catch (IOException e) {
-                        return false;
-                    }
-                    return true;
+            Future<Boolean> result = es.submit(() -> {
+                try {
+                    downloadUrl(firstUrlWeatherApiPart + cityId + secondUrlWeatherApiPart);
+                } catch (IOException e) {
+                    return false;
                 }
+                return true;
             });
             try {
                 if(!result.get()) {
@@ -176,6 +243,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
 
         private boolean updateLatitudeOrLongitude(Preference preference, String stringValue) {
+            if (isCityByNameEnabled(preference.getContext())) {
+                final String astroWeatherByCityNameTitle = "Astroweather by City Name Enabled";
+                final String astroWeatherByCityNameContent = "Disable it to set custom coordinates";
+                displayAlert(astroWeatherByCityNameTitle, astroWeatherByCityNameContent, preference.getContext());
+                return false;
+            }
             if (!NumberUtils.isParsable(stringValue)
                     || Double.parseDouble(stringValue) <= -80
                     || Double.parseDouble(stringValue) >= 80) {
@@ -207,8 +280,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     }
 
     private static void bindPreferenceSummaryToValue(Preference preference) {
+
         preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
+        if (preference instanceof SwitchPreference) {
+            sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, "");
+        } else
+            sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
@@ -316,6 +393,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             addPreferencesFromResource(R.xml.pref_weather);
             setHasOptionsMenu(true);
             listPreference = (ListPreference) findPreference(getResources().getString(R.string.weather_city_key));
+            bindPreferenceSummaryToValue(findPreference(getResources().getString(R.string.astroweatherSource)));
             bindPreferenceSummaryToValue(findPreference(getResources().getString(R.string.weather_units_key)));
             bindPreferenceSummaryToValue(findPreference(getResources().getString(R.string.city1_key)));
             bindPreferenceSummaryToValue(findPreference(getResources().getString(R.string.city2_key)));
