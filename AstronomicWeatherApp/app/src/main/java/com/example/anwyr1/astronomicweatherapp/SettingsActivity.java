@@ -51,6 +51,7 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
     private static String city1, city2, city3, city4, city5;
+    private static ListPreference listPreference;
 
     public static boolean isCityByNameEnabled(Context context) {
         return getBoolFromSettings("astroweatherSource", true, context);
@@ -75,7 +76,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     private static void updateLatitudeAmdLongitude(String city, Context context) {
         Single<CurrentWeather> currentWeatherSingle = Single.create(emitter -> {
-            String searchCity = city.replaceAll(" ", "");
+            String searchCity  = city.replaceAll("\\s","%20");
             CurrentWeather currentWeather = loadXmlFromNetworkAndRefreshData("http://api.openweathermap.org/data/2.5/weather?q="
                     + searchCity + "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=");
             emitter.onSuccess(currentWeather);
@@ -89,29 +90,42 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 });
     }
 
+    private static void updateSelectedCity(Context context) {
+        Single<CurrentWeather> currentWeatherSingle = Single.create(emitter -> {
+            String latitude = getFromSettings("latitude", "Lodz, PL", context);
+            String longitude = getFromSettings("longitude", "Lodz, PL", context);
+            CurrentWeather currentWeather = loadXmlFromNetworkAndRefreshData("http://api.openweathermap.org/data/2.5/weather?lat="
+                    + latitude + "&lon=" + longitude + "&mode=xml&appid=6568cca14ced23610c0a31b4f0bc5562&units=");
+            emitter.onSuccess(currentWeather);
+        });
+        currentWeatherSingle
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(currentWeather -> {
+                    setSettings("selected_city", String.format("%s, %s",
+                            currentWeather.getCity().getName(),
+                            currentWeather.getCity().getCountry().getCountryCode()) , context);
+                });
+    }
+
     private static CurrentWeather loadXmlFromNetworkAndRefreshData(String urlString) {
-        HttpURLConnection conn = null;
         try {
-            URL url = new URL(urlString);
-            conn = (HttpURLConnection) url.openConnection();
-            conn .setReadTimeout(10000);
-            conn.setConnectTimeout(15000);
-            conn.setRequestMethod("GET");
-            conn.setDoInput(true);
-            conn.connect();
-            return new ActualWeatherXmlParser().parse(conn.getInputStream());
+            return new ActualWeatherXmlParser().parse(downloadUrl(urlString));
         } catch (Exception ex) {
             ex.printStackTrace();
-        } finally {
-            try {
-                if (conn.getInputStream() != null) {
-                    conn.getInputStream().close();
-                }
-            } catch (Exception e) {
-                    e.printStackTrace();
-            }
         }
         return null;
+    }
+
+    private static InputStream downloadUrl(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setReadTimeout(1000 /* milliseconds */);
+        conn.setConnectTimeout(1500 /* milliseconds */);
+        conn.setRequestMethod("GET");
+        conn.setDoInput(true);
+        conn.connect();
+        return conn.getInputStream();
     }
 
     /**
@@ -139,6 +153,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                 ? listPreference.getEntries()[index]
                                 : null);
                 if (preference.getKey().equals("selected_city")) {
+                    if (!isCityByNameEnabled(preference.getContext())) return false;
                     if(isCityValid(stringValue)) {
                         if (isCityByNameEnabled(preference.getContext())) {
                             updateLatitudeAmdLongitude(stringValue, preference.getContext());
@@ -151,6 +166,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     || preference.getKey().equals("longitude"))) {
                 if (!updateLatitudeOrLongitude(preference, stringValue))
                     return false;
+                updateSelectedCity(preference.getContext());
             } else if (preference instanceof EditTextPreference) {
                 if (updateProperFavoriteCity(preference, stringValue))
                     preference.setSummary(stringValue);
@@ -231,17 +247,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return true;
         }
 
-        private InputStream downloadUrl(String urlString) throws IOException {
-            URL url = new URL(urlString);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(1000 /* milliseconds */);
-            conn.setConnectTimeout(1500 /* milliseconds */);
-            conn.setRequestMethod("GET");
-            conn.setDoInput(true);
-            conn.connect();
-            return conn.getInputStream();
-        }
-
         private boolean updateLatitudeOrLongitude(Preference preference, String stringValue) {
             if (isCityByNameEnabled(preference.getContext())) {
                 final String astroWeatherByCityNameTitle = "Astroweather by City Name Enabled";
@@ -258,6 +263,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 return false;
             }
             preference.setSummary(stringValue);
+            SettingsActivity.setSettings(preference.getKey(), stringValue, preference.getContext());
             return true;
         }
 
@@ -385,7 +391,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class NotificationPreferenceFragment extends PreferenceFragment {
-        private static ListPreference listPreference;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {

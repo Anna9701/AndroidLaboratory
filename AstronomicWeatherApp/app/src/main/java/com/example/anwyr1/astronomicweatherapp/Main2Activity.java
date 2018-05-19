@@ -126,8 +126,12 @@ public class Main2Activity extends AppCompatActivity
     }
 
     public void refreshWeather() {
-        actualWeatherFragment.refreshCurrentWeather();
-        forecastFragment.refreshCurrentWeather();
+        try {
+            actualWeatherFragment.refreshCurrentWeather();
+            forecastFragment.refreshCurrentWeather();
+        } catch (NullPointerException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

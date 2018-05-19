@@ -13,7 +13,6 @@
         android:title="@string/wether_unit_name" />
     <SwitchPreference
         android:defaultValue="true"
-        android:dependency="@string/weather_city_key"
         android:disableDependentsState="false"
         android:key="@string/astroweatherSource"
         android:title="Astro Weather By City Name" />
@@ -21,6 +20,7 @@
 
         <ListPreference
             android:defaultValue="@string/pref_weather_cities_default_city"
+            android:dependency="@string/astroweatherSource"
             android:entries="@array/pref_weather_cities"
             android:entryValues="@array/pref_weather_cities"
             android:key="@string/weather_city_key"
@@ -61,8 +61,8 @@
             android:defaultValue="@string/additional_city_def_value"
             android:key="@string/city5_key"
             android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:title="@string/pref_weather_cities_title" />
+            android:title="@string/pref_weather_cities_title"
+            android:visibility="visible" />
     </PreferenceCategory>
 
     <!-- Allows the user to choose a ringtone in the 'notification' category. -->

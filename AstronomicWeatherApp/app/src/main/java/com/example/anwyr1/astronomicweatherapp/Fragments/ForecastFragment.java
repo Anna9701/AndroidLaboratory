@@ -188,7 +188,7 @@ public class ForecastFragment extends Fragment {
         Single<ForecastData> forecastDataSingle = Single.create(emitter -> {
             String currentCity = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_city_key),
                     getResources().getString(R.string.pref_weather_cities_default_city), getContext());
-            currentCity = currentCity.replaceAll("\\s","");
+            currentCity = currentCity.replaceAll("\\s","%20");
             String units = SettingsActivity.getFromSettings(getResources().getString(R.string.weather_units_key),
                     getResources().getString(R.string.pref_default_display_unit_value), getContext());
 
