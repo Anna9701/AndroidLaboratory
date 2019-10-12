@@ -10,11 +10,6 @@ import java.util.Stack;
 
 import static com.example.anwyr1.calculatorzad1.Services.MathematicalNamesUtils.*;
 
-/**
- * Created by anwyr1 on 22/03/2018.
- */
-
-
 public class ReversePolishNotationConverter implements IReversePolishNotationConverter {
     private Queue<IRPNSCharacter> sequence;
     private Stack<Operator> operatorsStack;
@@ -39,7 +34,7 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
         anyNumberConverted = false;
     }
 
-    public void setInput(final String input) {
+    void setInput(final String input) {
         this.input = input;
         sequence = new LinkedList<>();
         operatorsStack = new Stack<>();
@@ -77,7 +72,7 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
         double number;
         if(input.startsWith(String.valueOf(OPENING_BRACKET))) {  //handle negative number
             number = Double.parseDouble(input.substring(1, input.indexOf(CLOSING_BRACKET)));
-            input = input.substring(input.indexOf(CLOSING_BRACKET) + 1, input.length());
+            input = input.substring(input.indexOf(CLOSING_BRACKET) + 1);
             sequence.add(new RPNSCharacter(number));
             return;
         }
@@ -88,7 +83,7 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
             while (!isOperator(input.charAt(++i))) ;
             String tmpString = input.substring(0, i);
             number = Double.parseDouble(tmpString);
-            input = input.substring(i, input.length());
+            input = input.substring(i);
         }
         sequence.add(new RPNSCharacter(number));
     }
@@ -129,7 +124,7 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
     private char takeFirstCharFromInput() {
         final int firstCharacterIndex = 0;
         final char firstCharacter = input.charAt(0);
-        input = input.substring(firstCharacterIndex + 1, input.length());
+        input = input.substring(firstCharacterIndex + 1);
         return firstCharacter;
     }
 
@@ -152,7 +147,7 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
             }
             String number = input.substring(0, i);
             number = prepareInputToCountMathematicalFunctionValue(number);
-            input = number + input.substring(i, input.length());
+            input = number + input.substring(i);
         } else {
             input = prepareInputToCountMathematicalFunctionValue(input);
         }
@@ -164,9 +159,9 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
         while (i < number.length() && !(Character.isDigit(number.charAt(i++))));
         String function = number.substring(0, --i);
         String functionValue = EMPTY_STRING;
-        if (function.endsWith(String.valueOf(OPENING_BRACKET) + String.valueOf(MINUS_CHARACTER))) {
+        if (function.endsWith(String.valueOf(OPENING_BRACKET) + MINUS_CHARACTER)) {
             functionValue += MINUS_CHARACTER;
-            function = function.substring(0, function.indexOf(String.valueOf(OPENING_BRACKET) + String.valueOf(MINUS_CHARACTER)));
+            function = function.substring(0, function.indexOf(OPENING_BRACKET + String.valueOf(MINUS_CHARACTER)));
             ++j;
         }
         functionValue += number.substring(i, number.length() - j);

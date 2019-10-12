@@ -3,10 +3,6 @@ package com.example.anwyr1.calculatorzad1.Services;
 import com.example.anwyr1.calculatorzad1.Enumerations.Action;
 import com.example.anwyr1.calculatorzad1.Interfaces.IRPNSCharacter;
 
-/**
- * Created by anwyr1 on 22/03/2018.
- */
-
 public class RPNSCharacter implements IRPNSCharacter {
     private double number;
     private Action operator;

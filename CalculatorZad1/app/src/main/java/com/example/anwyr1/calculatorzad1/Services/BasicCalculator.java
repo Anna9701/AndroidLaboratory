@@ -13,10 +13,6 @@ import com.example.anwyr1.calculatorzad1.Interfaces.IRPNSCharacter;
 
 import static com.example.anwyr1.calculatorzad1.Services.MathematicalNamesUtils.*;
 
-/**
- * Created by anwyr1 on 10/03/2018.
- */
-
 public class BasicCalculator {
     final static String ERROR_ALERT_TITLE = "Error";
     final static String ERROR_ALERT_DEFAULT_CONTENT = "Faulty operation requested";
@@ -52,7 +48,7 @@ public class BasicCalculator {
     }
 
     public void handleDotInput() {
-        String inputs[] = getInputTextSplit();
+        String[] inputs = getInputTextSplit();
         if (inputs == null) {
             showAlert(ERROR_ALERT_TITLE, ERROR_ALERT_DEFAULT_CONTENT);
             return;
@@ -111,8 +107,8 @@ public class BasicCalculator {
             showAlert(ERROR_ALERT_TITLE, ERROR_ALERT_DEFAULT_CONTENT);
             return;
         }
-        input = input.replace(String.valueOf(MINUS_CHARACTER), String.valueOf(SPACE_CHARACTER) + String.valueOf(MINUS_CHARACTER));
-        input = input.replace(String.valueOf(OPENING_BRACKET) + String.valueOf(SPACE_CHARACTER), String.valueOf(OPENING_BRACKET));
+        input = input.replace(String.valueOf(MINUS_CHARACTER), SPACE_CHARACTER + String.valueOf(MINUS_CHARACTER));
+        input = input.replace(String.valueOf(OPENING_BRACKET) + SPACE_CHARACTER, String.valueOf(OPENING_BRACKET));
         String[] split = input.split(isPositiveOrNegativeNumber);
         int index = split.length;
         if (index-- == 0 || !Character.isDigit(input.charAt(input.length() - 1)) &&
@@ -132,20 +128,19 @@ public class BasicCalculator {
 
     private void changeIntoNegative(String input, String split) {
         textView.setText(input.subSequence(0, input.length() - split.length()));
-        split =   String.valueOf(OPENING_BRACKET) + String.valueOf(MINUS_CHARACTER)
-                + split + String.valueOf(CLOSING_BRACKET);
+        split = OPENING_BRACKET + String.valueOf(MINUS_CHARACTER)
+                + split + CLOSING_BRACKET;
         textView.append(split);
     }
 
     private void changeIntoPositive(String input, String split) {
-        if (split.contains(String.valueOf(OPENING_BRACKET) + String.valueOf(MINUS_CHARACTER))) {
-            textView.setText(input.subSequence(0, input.length() - split.length()));
-            split = split.substring((String.valueOf(OPENING_BRACKET) + String.valueOf(MINUS_CHARACTER)).length(),
+        textView.setText(input.subSequence(0, input.length() - split.length()));
+        if (split.contains(OPENING_BRACKET + String.valueOf(MINUS_CHARACTER))) {
+            split = split.substring((OPENING_BRACKET + String.valueOf(MINUS_CHARACTER)).length(),
                     split.length() - String.valueOf(CLOSING_BRACKET).length());
             textView.append(split);
         } else {
-            textView.setText(input.subSequence(0, input.length() - split.length()));
-            split = String.valueOf(PLUS_CHARACTER) + split.substring(1);
+            split = PLUS_CHARACTER + split.substring(1);
             textView.append(split);
         }
     }

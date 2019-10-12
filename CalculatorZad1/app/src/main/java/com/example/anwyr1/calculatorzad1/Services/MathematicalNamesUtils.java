@@ -1,9 +1,5 @@
 package com.example.anwyr1.calculatorzad1.Services;
 
-/**
- * Created by anwyr1 on 24/03/2018.
- */
-
 public abstract class MathematicalNamesUtils {
     public static final String SQUARE = "2";
     public static final String SINUS_NAME = "sin";

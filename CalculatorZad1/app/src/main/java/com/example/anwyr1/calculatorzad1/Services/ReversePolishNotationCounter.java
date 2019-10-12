@@ -6,10 +6,6 @@ import com.example.anwyr1.calculatorzad1.Interfaces.IRPNSCharacter;
 import java.util.Queue;
 import java.util.Stack;
 
-/**
- * Created by anwyr1 on 22/03/2018.
- */
-
 class ReversePolishNotationCounter {
     static Action lastOperator;
     static double lastNumber;
@@ -23,7 +19,7 @@ class ReversePolishNotationCounter {
             } else {
                 double a = stack.pop().getNumber();
                 double b = stack.pop().getNumber();
-                Double value = countValue (a, b, symbol.getOperator());
+                double value = countValue (a, b, symbol.getOperator());
                 lastOperator = symbol.getOperator();
                 lastNumber = a;
                 stack.push(new RPNSCharacter(value));
