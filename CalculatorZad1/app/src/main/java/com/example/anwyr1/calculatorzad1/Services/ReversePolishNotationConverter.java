@@ -132,7 +132,7 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
         for (int i = 1; i < input.length(); ++i) {
             if (isOperator(input.charAt(i)))
                 if (!(input.charAt(i - 1) == OPENING_BRACKET))
-                return false;
+                    return false;
         }
         return true;
     }
