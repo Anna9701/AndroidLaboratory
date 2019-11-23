@@ -77,6 +77,8 @@ public class BasicCalculator {
         if (textView.getText().length() == 0) {
             showAlert(ERROR_ALERT_TITLE, ERROR_ALERT_DEFAULT_CONTENT);
             return;
+        } else if (textView.getText().charAt(0) == '+') {
+            textView.setText(textView.getText().toString().substring(1));
         }
 
         if (resultPrinted && ReversePolishNotationCounter.lastOperator != null) {
@@ -96,6 +98,9 @@ public class BasicCalculator {
             result = 0;
         }
         String resultString = new BigDecimal(result).toPlainString();
+        if (resultString.startsWith("-")) {
+            resultString = "(" + resultString + ")";
+        }
         textView.setText(resultString);
         resultPrinted = true;
     }

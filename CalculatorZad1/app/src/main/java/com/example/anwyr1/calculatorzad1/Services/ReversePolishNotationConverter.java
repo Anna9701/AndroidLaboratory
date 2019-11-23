@@ -80,7 +80,7 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
             number = Double.parseDouble(input);
             input = EMPTY_STRING;
         } else {
-            while (!isOperator(input.charAt(++i))) ;
+            while (++i < input.length() && !isOperator(i)) ;
             String tmpString = input.substring(0, i);
             number = Double.parseDouble(tmpString);
             input = input.substring(i);
@@ -194,5 +194,9 @@ public class ReversePolishNotationConverter implements IReversePolishNotationCon
 
     private boolean isOperator(char character) {
         return Operator.isOperator(character);
+    }
+
+    private boolean isOperator(int index) {
+        return Operator.isOperator(input.charAt(index)) && !(input.charAt(index - 1) == 'E');
     }
 }
