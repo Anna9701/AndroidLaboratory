@@ -1,10 +1,12 @@
 package com.anna.wyrwal.musicplaceslocator.MusicBrainz
 
+import com.beust.klaxon.Json
+
 data class Area(
     val id: String,
-    val life-span: LifeSpan,
+    @Json(name = "life-span")val life_span: LifeSpan,
     val name: String,
-    val sort-name: String,
+    val sort_name: String,
     val type: String,
-    val type-id: String
+    @Json(name = "type-id")val type_id: String
 )
