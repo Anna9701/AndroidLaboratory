@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class Place(
     val address: String,
     val area: Area,
-    val coordinates: Coordinates,
+    val coordinates: Coordinates?,
     val disambiguation: String,
     val id: String,
     @SerializedName(value = "life-span")val life_span: LifeSpan,

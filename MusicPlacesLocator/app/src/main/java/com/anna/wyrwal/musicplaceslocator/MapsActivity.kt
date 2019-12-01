@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.ImageButton
 import android.widget.TextView
+import com.anna.wyrwal.musicplaceslocator.MusicBrainz.Coordinates
 import com.anna.wyrwal.musicplaceslocator.MusicBrainz.MusicBrainzApiService
+import com.anna.wyrwal.musicplaceslocator.MusicBrainz.Place
 import com.anna.wyrwal.musicplaceslocator.MusicBrainz.PlaceQueryResponse
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -14,6 +16,8 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import android.app.Activity
+import android.view.inputmethod.InputMethodManager
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -31,16 +35,39 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val searchField = findViewById<TextView>(R.id.searchPlaceTextView)
         val searchButton = findViewById<ImageButton>(R.id.searchButton)
         searchButton.setOnClickListener {
-            apiService.searchPlace(searchField.text.toString(), {showResult(it)}, {showError(it)})
+            hideKeyboard()
+            apiService.searchPlace(
+                searchField.text.toString(),
+                { showResult(it) },
+                { showError(it) })
         }
     }
 
+    private fun hideKeyboard() {
+        val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+    }
+
     private fun showResult(placeQueryResponse: PlaceQueryResponse?) {
-        Log.d("IMusicBrainzApiService", placeQueryResponse?.places?.size.toString())
+        placeQueryResponse?.places?.filterNot { it.coordinates == null }?.forEach {
+            addPlaceMarker(it)
+        }
+        val fistPlaceCords =
+            placeQueryResponse?.places?.firstOrNull { it.coordinates != null }?.coordinates
+                ?: Coordinates("0", "0")
+        val position =
+            LatLng(fistPlaceCords.latitude.toDouble(), fistPlaceCords.longitude.toDouble())
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(position))
+    }
+
+    private fun addPlaceMarker(place: Place) {
+        val position =
+            LatLng(place.coordinates!!.latitude.toDouble(), place.coordinates.longitude.toDouble())
+        mMap.addMarker(MarkerOptions().position(position).title(place.name))
     }
 
     private fun showError(message: String?) {
-        Log.e("IMusicBrainzApiService", message ?: "Unknown Error")
+        Log.e("MusicBrainzApiService", message ?: "Unknown Error")
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
