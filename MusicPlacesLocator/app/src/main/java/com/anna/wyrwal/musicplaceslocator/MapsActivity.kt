@@ -1,9 +1,9 @@
 package com.anna.wyrwal.musicplaceslocator
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import com.anna.wyrwal.musicplaceslocator.MusicBrainz.Coordinates
 import com.anna.wyrwal.musicplaceslocator.MusicBrainz.MusicBrainzApiService
 import com.anna.wyrwal.musicplaceslocator.MusicBrainz.Place
 import com.anna.wyrwal.musicplaceslocator.MusicBrainz.PlaceQueryResponse
@@ -31,7 +31,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -40,7 +39,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             apiService.searchPlace(
                 searchPlaceTextView.text.toString(),
                 { showResult(it) },
-                { showError(it) })
+                { logError(it) })
         }
         clearButton.setOnClickListener {
             mMap.clear()
@@ -54,17 +53,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun showResult(placeQueryResponse: PlaceQueryResponse?) {
         val places =
-            placeQueryResponse?.places?.filterNot { it.coordinates == null ||
-                    it.life_span.getOpeningYear() < minimalOpeningYear }
+            placeQueryResponse?.places?.filterNot {
+                it.coordinates == null ||
+                        it.life_span.getOpeningYear() < minimalOpeningYear
+            }
         places?.forEach {
             addPlaceMarker(it)
         }
-        val fistPlaceCords = places?.first()?.coordinates ?: Coordinates("0", "0")
-        val position =
-            LatLng(fistPlaceCords.latitude.toDouble(), fistPlaceCords.longitude.toDouble())
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(position))
     }
 
+    @SuppressLint("CheckResult")
     private fun addPlaceMarker(place: Place) {
         val position =
             LatLng(place.coordinates!!.latitude.toDouble(), place.coordinates.longitude.toDouble())
@@ -77,16 +75,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .subscribe { marker.remove() }
     }
 
-    private fun showError(message: String?) {
+    private fun logError(message: String?) {
         Log.e("MusicBrainzApiService", message ?: "Unknown Error")
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        val berlin = CameraUpdateFactory.newLatLngZoom(LatLng(52.52, 13.4050), 4f)
+        mMap.moveCamera(berlin)
     }
 }
