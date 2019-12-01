@@ -7,4 +7,4 @@ data class PlaceQueryResponse(
     val places: List<Place>
 )
 
-//https://musicbrainz.org/ws/2/place/?query=AA&fmt=json
+

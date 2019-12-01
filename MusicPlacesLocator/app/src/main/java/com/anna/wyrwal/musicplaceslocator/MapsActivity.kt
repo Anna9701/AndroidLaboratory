@@ -2,6 +2,11 @@ package com.anna.wyrwal.musicplaceslocator
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.widget.ImageButton
+import android.widget.TextView
+import com.anna.wyrwal.musicplaceslocator.MusicBrainz.MusicBrainzApiService
+import com.anna.wyrwal.musicplaceslocator.MusicBrainz.PlaceQueryResponse
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -10,7 +15,9 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 
+
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+    private val apiService = MusicBrainzApiService()
 
     private lateinit var mMap: GoogleMap
 
@@ -21,17 +28,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        val searchField = findViewById<TextView>(R.id.searchPlaceTextView)
+        val searchButton = findViewById<ImageButton>(R.id.searchButton)
+        searchButton.setOnClickListener {
+            apiService.searchPlace(searchField.text.toString(), {showResult(it)}, {showError(it)})
+        }
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+    private fun showResult(placeQueryResponse: PlaceQueryResponse?) {
+        Log.d("IMusicBrainzApiService", placeQueryResponse?.places?.size.toString())
+    }
+
+    private fun showError(message: String?) {
+        Log.e("IMusicBrainzApiService", message ?: "Unknown Error")
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
