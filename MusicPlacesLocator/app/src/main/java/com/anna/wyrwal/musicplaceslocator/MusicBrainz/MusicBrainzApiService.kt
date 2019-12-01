@@ -12,10 +12,10 @@ class MusicBrainzApiService {
     private var disposable: Disposable? = null
 
     fun searchPlace(place: String, successCallback: (result: PlaceQueryResponse) -> Unit,
-                            errorCallback: (errorMsg: String?) -> Unit) {
+                            errorCallback: (errorMsg: String?) -> Unit, limit: Int = 25, offset: Int = 0) {
         Log.d("Place", place)
         disposable =
-            apiService.searchMusicVenues(place)
+            apiService.searchMusicVenues(place, limit, offset)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

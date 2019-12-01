@@ -10,8 +10,12 @@ import retrofit2.http.Query
 interface IMusicBrainzApiService {
 
     @GET("https://musicbrainz.org/ws/2/place/")
-    fun searchMusicVenues(@Query("query") query: String,
-                      @Query("fmt") format: String = "json"):
+    fun searchMusicVenues(
+        @Query("query") query: String,
+        @Query("limit") limit: Int,
+        @Query("offset") offset: Int,
+        @Query("fmt") format: String = "json"
+    ):
             Observable<PlaceQueryResponse>
 
     companion object {
@@ -21,9 +25,11 @@ interface IMusicBrainzApiService {
 
             val retrofit = Retrofit.Builder()
                 .addCallAdapterFactory(
-                    RxJava2CallAdapterFactory.create())
+                    RxJava2CallAdapterFactory.create()
+                )
                 .addConverterFactory(
-                    GsonConverterFactory.create())
+                    GsonConverterFactory.create()
+                )
                 .baseUrl("https://musicbrainz.org/ws/2/place/")
                 .build()
 

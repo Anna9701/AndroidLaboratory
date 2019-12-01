@@ -3,8 +3,6 @@ package com.anna.wyrwal.musicplaceslocator
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.ImageButton
-import android.widget.TextView
 import com.anna.wyrwal.musicplaceslocator.MusicBrainz.Coordinates
 import com.anna.wyrwal.musicplaceslocator.MusicBrainz.MusicBrainzApiService
 import com.anna.wyrwal.musicplaceslocator.MusicBrainz.Place
@@ -18,10 +16,15 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import android.app.Activity
 import android.view.inputmethod.InputMethodManager
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import kotlinx.android.synthetic.main.activity_maps.*
+import java.util.concurrent.TimeUnit
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private val apiService = MusicBrainzApiService()
+    private val minimalOpeningYear = 1990
 
     private lateinit var mMap: GoogleMap
 
@@ -32,14 +35,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        val searchField = findViewById<TextView>(R.id.searchPlaceTextView)
-        val searchButton = findViewById<ImageButton>(R.id.searchButton)
         searchButton.setOnClickListener {
             hideKeyboard()
             apiService.searchPlace(
-                searchField.text.toString(),
+                searchPlaceTextView.text.toString(),
                 { showResult(it) },
                 { showError(it) })
+        }
+        clearButton.setOnClickListener {
+            mMap.clear()
         }
     }
 
@@ -49,12 +53,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun showResult(placeQueryResponse: PlaceQueryResponse?) {
-        placeQueryResponse?.places?.filterNot { it.coordinates == null }?.forEach {
+        val places =
+            placeQueryResponse?.places?.filterNot { it.coordinates == null ||
+                    it.life_span.getOpeningYear() < minimalOpeningYear }
+        places?.forEach {
             addPlaceMarker(it)
         }
-        val fistPlaceCords =
-            placeQueryResponse?.places?.firstOrNull { it.coordinates != null }?.coordinates
-                ?: Coordinates("0", "0")
+        val fistPlaceCords = places?.first()?.coordinates ?: Coordinates("0", "0")
         val position =
             LatLng(fistPlaceCords.latitude.toDouble(), fistPlaceCords.longitude.toDouble())
         mMap.moveCamera(CameraUpdateFactory.newLatLng(position))
@@ -63,7 +68,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun addPlaceMarker(place: Place) {
         val position =
             LatLng(place.coordinates!!.latitude.toDouble(), place.coordinates.longitude.toDouble())
-        mMap.addMarker(MarkerOptions().position(position).title(place.name))
+
+        val marker = mMap.addMarker(MarkerOptions().position(position).title(place.name))
+        val delay = place.life_span.getOpeningYear() - minimalOpeningYear
+        Observable
+            .timer(delay.toLong(), TimeUnit.SECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { marker.remove() }
     }
 
     private fun showError(message: String?) {
